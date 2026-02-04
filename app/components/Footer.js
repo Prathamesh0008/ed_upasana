@@ -1,71 +1,102 @@
+'use client';
+
 import { FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-r from-blue-900 to-blue-800 text-white">
+    <footer className="bg-gradient-to-r from-[#122E34] via-[#0E1D21] to-[#2596be] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 font-bold">EP</span>
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#122E34] to-[#2596be] flex items-center justify-center">
+                <span className="text-white font-bold text-xl">EP</span>
               </div>
-              <span className="text-xl font-bold">EdPharma</span>
+              <span className="text-2xl font-bold text-white">EdPharma</span>
             </div>
-            <p className="text-blue-200 mb-6">
+            <p className="text-white/90 mb-6">
               Your trusted partner in healthcare. Quality medicines with fast delivery.
             </p>
+            <div className="flex space-x-4">
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                <FiFacebook className="w-5 h-5 text-white" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                <FiTwitter className="w-5 h-5 text-white" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                <FiInstagram className="w-5 h-5 text-white" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                <FiLinkedin className="w-5 h-5 text-white" />
+              </a>
+            </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-bold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-bold mb-6 text-white flex items-center gap-2">
+              <div className="w-2 h-6 bg-gradient-to-b from-[#2596be] to-[#122E34] rounded-full"></div>
+              Quick Links
+            </h3>
             <ul className="space-y-3">
               <li>
-                <a href="/" className="text-blue-200 hover:text-white">
+                <Link href="/" className="text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 group">
+                  <div className="w-1 h-1 rounded-full bg-[#2596be] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   Home
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/products" className="text-blue-200 hover:text-white">
+                <Link href="/products" className="text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 group">
+                  <div className="w-1 h-1 rounded-full bg-[#2596be] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   Products
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/services" className="text-blue-200 hover:text-white">
+                <Link href="/services" className="text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 group">
+                  <div className="w-1 h-1 rounded-full bg-[#2596be] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   Services
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/contact" className="text-blue-200 hover:text-white">
+                <Link href="/contact" className="text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 group">
+                  <div className="w-1 h-1 rounded-full bg-[#2596be] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   Contact
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
 
           {/* Categories */}
           <div>
-            <h3 className="text-lg font-bold mb-4">Categories</h3>
+            <h3 className="text-lg font-bold mb-6 text-white flex items-center gap-2">
+              <div className="w-2 h-6 bg-gradient-to-b from-[#2596be] to-[#122E34] rounded-full"></div>
+              Categories
+            </h3>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-blue-200 hover:text-white">
+                <a href="#" className="text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 group">
+                  <div className="w-1 h-1 rounded-full bg-[#2596be] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   Prescription Medicines
                 </a>
               </li>
               <li>
-                <a href="#" className="text-blue-200 hover:text-white">
+                <a href="#" className="text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 group">
+                  <div className="w-1 h-1 rounded-full bg-[#2596be] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   Medical Devices
                 </a>
               </li>
               <li>
-                <a href="#" className="text-blue-200 hover:text-white">
+                <a href="#" className="text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 group">
+                  <div className="w-1 h-1 rounded-full bg-[#2596be] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   Personal Care
                 </a>
               </li>
               <li>
-                <a href="#" className="text-blue-200 hover:text-white">
+                <a href="#" className="text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 group">
+                  <div className="w-1 h-1 rounded-full bg-[#2596be] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   Health Supplements
                 </a>
               </li>
@@ -74,26 +105,85 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-lg font-bold mb-4">Contact Us</h3>
+            <h3 className="text-lg font-bold mb-6 text-white flex items-center gap-2">
+              <div className="w-2 h-6 bg-gradient-to-b from-[#2596be] to-[#122E34] rounded-full"></div>
+              Contact Info
+            </h3>
             <ul className="space-y-4">
-              <li className="flex items-center space-x-3">
-                <FiPhone className="w-5 h-5 text-blue-300" />
-                <span className="text-blue-200">+1 (555) 123-4567</span>
+              <li className="flex items-start space-x-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-[#122E34] to-[#2596be] flex items-center justify-center shrink-0">
+                  <FiPhone className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">+1 (555) 123-4567</p>
+                  <p className="text-white/80 text-sm">Mon–Fri 9am–6pm EST</p>
+                </div>
               </li>
-              <li className="flex items-center space-x-3">
-                <FiMail className="w-5 h-5 text-blue-300" />
-                <span className="text-blue-200">info@edpharma.com</span>
+              <li className="flex items-start space-x-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-[#122E34] to-[#2596be] flex items-center justify-center shrink-0">
+                  <FiMail className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">support@edpharma.com</p>
+                  <p className="text-white/80 text-sm">General inquiries</p>
+                </div>
               </li>
-              <li className="flex items-center space-x-3">
-                <FiMapPin className="w-5 h-5 text-blue-300" />
-                <span className="text-blue-200">123 Health Street</span>
+              <li className="flex items-start space-x-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-[#122E34] to-[#2596be] flex items-center justify-center shrink-0">
+                  <FiMapPin className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">123 Health Street</p>
+                  <p className="text-white/80 text-sm">Medical City, MC 12345</p>
+                </div>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-blue-800 mt-8 pt-8 text-center text-blue-200">
-          <p>&copy; {new Date().getFullYear()} EdPharma. All rights reserved.</p>
+        {/* Newsletter Section */}
+        <div className="mt-12 rounded-2xl bg-white/10 p-6 border border-white/20">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">Stay Updated</h3>
+              <p className="text-white/80">Subscribe to our newsletter for health tips and offers</p>
+            </div>
+            <div className="flex w-full md:w-auto">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-1 md:w-80 px-4 py-3 rounded-l-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#2596be]"
+              />
+              <button className="px-6 py-3 bg-gradient-to-r from-[#2596be] to-[#122E34] text-white font-semibold rounded-r-xl hover:from-[#2596be]/90 hover:to-[#122E34]/90 transition">
+                Subscribe
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-white/20 mt-8 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="text-center md:text-left">
+              <p className="text-white/80">
+                &copy; {new Date().getFullYear()} EdPharma. All rights reserved.
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              <Link href="/privacy&policy" className="text-white/80 hover:text-white transition-colors">
+                privacy Policy
+              </Link>
+              <Link href="/Terms&Condition" className="text-white/80 hover:text-white transition-colors">
+                Terms of Sevirce
+              </Link>
+              <Link href="/sitemap" className="text-white/80 hover:text-white transition-colors">
+                Sitemap
+              </Link>
+              <Link href="/FAQ" className="text-white/80 hover:text-white transition-colors">
+                FAQ
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
