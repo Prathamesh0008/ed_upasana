@@ -3,22 +3,26 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
+  FiCheck, 
+  FiChevronRight, 
+  FiX, 
+  FiPackage, 
+  FiActivity, 
+  FiUsers, 
+  FiShield, 
+  FiClock, 
+  FiGlobe, 
+  FiBarChart, 
+  FiSettings,
   FiArrowRight,
-  FiCheck,
-  FiUsers,
   FiStar,
-  FiShield,
   FiTruck,
   FiHeadphones,
-  FiChevronRight,
   FiPhone,
   FiMail,
   FiMapPin,
-  FiActivity,
-  FiPackage,
   FiClipboard,
   FiAlertCircle,
-  FiClock,
   FiHome,
   FiUpload,
   FiArrowUpRight,
@@ -35,6 +39,7 @@ import {
 export default function HomePage() {
   const [scrollY, setScrollY] = useState(0);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [selectedService, setSelectedService] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,6 +48,17 @@ export default function HomePage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Handle modal open/close with body scroll lock
+  const handleServiceClick = (service) => {
+    setSelectedService(service);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const handleCloseModal = () => {
+    setSelectedService(null);
+    document.body.style.overflow = 'unset';
+  };
 
   // Professional Pharma Banner Data
   const bannerData = {
@@ -56,42 +72,103 @@ export default function HomePage() {
     ]
   };
 
+  // Updated services with full descriptions for modal
   const services = [
     {
       id: 1,
       title: 'Virtual Consultation',
       description: 'Connect with licensed pharmacists via secure video call for expert medical advice.',
+      fullDescription: 'Our Virtual Consultation service provides secure, HIPAA-compliant video calls with licensed pharmacists. Get expert medical advice, prescription refills, and medication reviews from the comfort of your home. Our pharmacists are available 24/7 to address your health concerns and provide personalized recommendations.',
       icon: <FiHeadphones className="h-8 w-8" />,
       gradient: 'from-[#2596be] to-[#122E34]',
       link: '/services/consultation',
-      features: ['24/7 Available', 'Prescription Refills', 'Medication Reviews']
+      features: ['24/7 Available', 'Prescription Refills', 'Medication Reviews'],
+      benefits: [
+        'Access to certified pharmacists anytime',
+        'Secure and confidential consultations',
+        'Personalized health advice',
+        'Digital prescription management'
+      ],
+      processes: [
+        'Schedule appointment online',
+        'Secure video consultation',
+        'Receive digital prescription',
+        'Follow-up care planning'
+      ],
+      timeline: 'Consultations available within 15 minutes',
+      coverage: 'Available nationwide'
     },
     {
       id: 2,
       title: 'Prescription Delivery',
       description: 'Fast, discreet delivery of medications directly to your doorstep.',
+      fullDescription: 'Our Prescription Delivery service ensures your medications reach you safely and on time. With temperature-controlled packaging and real-time tracking, we guarantee the integrity of your medications. Same-day delivery available in major metropolitan areas with discreet packaging for your privacy.',
       icon: <FiTruck className="h-8 w-8" />,
       gradient: 'from-[#122E34] to-[#0E1D21]',
       link: '/services/delivery',
-      features: ['Same-Day Service', 'Temperature Control', 'Secure Packaging']
+      features: ['Same-Day Service', 'Temperature Control', 'Secure Packaging'],
+      benefits: [
+        'Convenient home delivery',
+        'Medication integrity maintained',
+        'Real-time delivery tracking',
+        'Discrete and confidential packaging'
+      ],
+      processes: [
+        'Prescription verification',
+        'Pharmacy dispensing',
+        'Quality check & packaging',
+        'Delivery with tracking'
+      ],
+      timeline: 'Same-day delivery available',
+      coverage: 'Major metropolitan areas'
     },
     {
       id: 3,
       title: 'Medication Management',
       description: 'Comprehensive medication reviews and adherence support programs.',
+      fullDescription: 'Our Medication Management service provides comprehensive support for medication adherence and safety. We conduct thorough medication reviews, check for potential interactions, and provide personalized adherence plans. Our system includes dose reminders and progress tracking to ensure optimal therapeutic outcomes.',
       icon: <FiDroplet className="h-8 w-8" />,
       gradient: 'from-[#2596be] to-[#0E1D21]',
       link: '/services/management',
-      features: ['Dose Reminders', 'Interactions Check', 'Adherence Tracking']
+      features: ['Dose Reminders', 'Interactions Check', 'Adherence Tracking'],
+      benefits: [
+        'Reduced medication errors',
+        'Improved treatment adherence',
+        'Personalized care plans',
+        'Regular progress monitoring'
+      ],
+      processes: [
+        'Medication review & reconciliation',
+        'Interaction screening',
+        'Personalized adherence plan',
+        'Regular follow-up & adjustment'
+      ],
+      timeline: 'Ongoing management program',
+      coverage: 'Personalized for each patient'
     },
     {
       id: 4,
       title: 'Chronic Care Support',
       description: 'Specialized programs for diabetes, hypertension, and other chronic conditions.',
+      fullDescription: 'Our Chronic Care Support service provides specialized programs for managing chronic conditions like diabetes, hypertension, and cardiovascular diseases. We offer personalized treatment plans, regular monitoring, and expert guidance to help you manage your condition effectively and improve your quality of life.',
       icon: <FiActivity className="h-8 w-8" />,
       gradient: 'from-[#2596be] via-[#122E34] to-[#0E1D21]',
       link: '/services/chronic-care',
-      features: ['Personalized Plans', 'Regular Monitoring', 'Expert Guidance']
+      features: ['Personalized Plans', 'Regular Monitoring', 'Expert Guidance'],
+      benefits: [
+        'Better chronic disease management',
+        'Reduced hospital visits',
+        'Improved quality of life',
+        'Personalized treatment approach'
+      ],
+      processes: [
+        'Condition assessment & planning',
+        'Regular monitoring & check-ins',
+        'Treatment adjustment as needed',
+        'Long-term management strategy'
+      ],
+      timeline: 'Continuous support program',
+      coverage: 'Comprehensive chronic care'
     }
   ];
 
@@ -203,7 +280,7 @@ export default function HomePage() {
 
   // Professional Pharma Banner Component
   const ProfessionalBanner = () => (
-    <div className="relative bg-gradient-to-r from-[#122E34] via-[#0E1D21] to-[#2596be] py-4 overflow-hidden">
+    <div className="relative bg-gradient-to-r from-[#122E34] via-[#0E1D21] to-[#2596be] py-4 overflow-hidden"> 
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -292,6 +369,13 @@ export default function HomePage() {
                   <span className="flex items-center">
                     View Our Services
                     <FiArrowUpRight className="ml-2 h-5 w-5" />
+                  </span>
+                </Link>
+
+                  <Link href="/booking" className={buttonClasses.primary}>
+                  <span className="flex items-center">
+                    booking
+                    <FiArrowRight className="ml-2 h-5 w-5" />
                   </span>
                 </Link>
               </div>
@@ -429,19 +513,161 @@ export default function HomePage() {
                     ))}
                   </div>
                   
-                  <Link
-                    href={service.link}
-                    className="inline-flex items-center text-[#2596be] font-semibold hover:text-[#122E34] transition-colors"
+                  <button
+                    onClick={() => handleServiceClick(service)}
+                    className="inline-flex items-center text-[#2596be] font-semibold hover:text-[#122E34] transition-colors group/button"
                   >
                     Learn More
-                    <FiChevronRight className="ml-2 h-5 w-5" />
-                  </Link>
+                    <FiChevronRight className="ml-2 h-5 w-5 group-hover/button:translate-x-1 transition-transform" />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Service Details Modal */}
+      {selectedService && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+            onClick={handleCloseModal}
+          />
+          
+          {/* Modal Container */}
+          <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div className="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl">
+              {/* Modal Header */}
+              <div className="bg-gradient-to-r from-[#2596be] to-[#122E34] px-6 py-4 sm:px-8 sm:py-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                      <div className="text-white">
+                        {selectedService.icon}
+                      </div>
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl font-bold text-white">
+                      {selectedService.title}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={handleCloseModal}
+                    className="text-white hover:text-gray-200 transition-colors p-2 hover:bg-white/10 rounded-full"
+                  >
+                    <FiX className="h-6 w-6" />
+                  </button>
+                </div>
+              </div>
+              
+              {/* Modal Content */}
+              <div className="px-6 py-8 sm:px-8 sm:py-10">
+                <div className="mb-8">
+                  <h4 className="text-lg font-semibold text-[#0E1D21] mb-4">Service Overview</h4>
+                  <p className="text-[#677E8A] leading-relaxed">
+                    {selectedService.fullDescription}
+                  </p>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-8 mb-8">
+                  {/* Key Features */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-[#0E1D21] mb-4 flex items-center">
+                      <FiCheck className="h-5 w-5 text-[#2596be] mr-2" />
+                      Key Features
+                    </h4>
+                    <div className="space-y-3">
+                      {selectedService.features.map((feature, index) => (
+                        <div key={index} className="flex items-center">
+                          <div className="h-2 w-2 bg-[#2596be] rounded-full mr-3" />
+                          <span className="text-[#0E1D21]">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Benefits */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-[#0E1D21] mb-4 flex items-center">
+                      <FiBarChart className="h-5 w-5 text-[#2596be] mr-2" />
+                      Key Benefits
+                    </h4>
+                    <div className="space-y-3">
+                      {selectedService.benefits.map((benefit, index) => (
+                        <div key={index} className="flex items-center">
+                          <div className="h-2 w-2 bg-[#2596be] rounded-full mr-3" />
+                          <span className="text-[#0E1D21]">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Processes */}
+                <div className="mb-8">
+                  <h4 className="text-lg font-semibold text-[#0E1D21] mb-4 flex items-center">
+                    <FiSettings className="h-5 w-5 text-[#2596be] mr-2" />
+                    Our Process
+                  </h4>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {selectedService.processes.map((process, index) => (
+                      <div key={index} className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center mb-2">
+                          <div className="flex items-center justify-center h-6 w-6 rounded-full bg-[#2596be] text-white text-sm font-semibold mr-3">
+                            {index + 1}
+                          </div>
+                          <span className="text-[#0E1D21] font-medium">{process}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Additional Information */}
+                <div className="grid sm:grid-cols-2 gap-6 mb-8">
+                  <div className="bg-gradient-to-r from-[#2596be]/5 to-transparent rounded-xl p-5">
+                    <div className="flex items-center mb-3">
+                      <FiClock className="h-5 w-5 text-[#2596be] mr-3" />
+                      <h5 className="font-semibold text-[#0E1D21]">Timeline</h5>
+                    </div>
+                    <p className="text-[#677E8A]">{selectedService.timeline}</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-[#122E34]/5 to-transparent rounded-xl p-5">
+                    <div className="flex items-center mb-3">
+                      <FiGlobe className="h-5 w-5 text-[#122E34] mr-3" />
+                      <h5 className="font-semibold text-[#0E1D21]">Coverage</h5>
+                    </div>
+                    <p className="text-[#677E8A]">{selectedService.coverage}</p>
+                  </div>
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row justify-between items-center pt-6 border-t border-gray-200">
+                  <button
+                    onClick={handleCloseModal}
+                    className="px-6 py-3 text-[#677E8A] hover:text-[#0E1D21] font-medium transition-colors mb-4 sm:mb-0"
+                  >
+                    Back to Services
+                  </button>
+                  <div className="flex space-x-4">
+                    <button className="px-6 py-3 border border-[#2596be] text-[#2596be] font-semibold rounded-lg hover:bg-[#2596be] hover:text-white transition-all">
+                      Download Brochure
+                    </button>
+                    <Link href="/consultation" className={buttonClasses.primary}>
+                      <span className="flex items-center">
+                        Request Consultation
+                        <FiArrowRight className="ml-2 h-5 w-5" />
+                      </span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Features Section - Professional Layout */}
       <div className="py-16 lg:py-24 bg-white">

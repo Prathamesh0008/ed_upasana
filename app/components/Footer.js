@@ -142,25 +142,7 @@ export default function Footer() {
         </div>
 
         {/* Newsletter Section */}
-        <div className="mt-12 rounded-2xl bg-white/10 p-6 border border-white/20">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div>
-              <h3 className="text-xl font-bold text-white mb-2">Stay Updated</h3>
-              <p className="text-white/80">Subscribe to our newsletter for health tips and offers</p>
-            </div>
-            <div className="flex w-full md:w-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 md:w-80 px-4 py-3 rounded-l-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#2596be]"
-              />
-              <button className="px-6 py-3 bg-gradient-to-r from-[#2596be] to-[#122E34] text-white font-semibold rounded-r-xl hover:from-[#2596be]/90 hover:to-[#122E34]/90 transition">
-                Subscribe
-              </button>
-            </div>
-          </div>
-        </div>
-
+       
         {/* Bottom Bar */}
         <div className="border-t border-white/20 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
