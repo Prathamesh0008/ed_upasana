@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import products from '../data/en';
+import { useCart } from '../context/CartContext';
+
 
 // COMPOUNDS DATA - Moved to same file
 const COMPOUNDS = {
@@ -374,16 +377,27 @@ const getAllProducts = () => {
 function ProductCard({ product }) {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  const { addToCart } = useCart();
   
-  const handleAddToCart = () => {
-    setIsAdding(true);
-    console.log(`Added ${quantity} ${product.name} to cart`);
-    
-    setTimeout(() => {
-      alert(`Added ${quantity} ${product.name} to cart!`);
-      setIsAdding(false);
-    }, 500);
-  };
+const handleAddToCart = () => {
+  setIsAdding(true);
+
+  addToCart({
+    id: product.slug,        // MUST be unique
+    name: product.name,
+    price: product.price,
+    quantity: quantity,
+    image: product.image || null,
+    brand: product.manufacturer,
+    dosage: product.compound,
+    packSize: "Strip",
+  });
+
+  setTimeout(() => {
+    setIsAdding(false);
+  }, 300);
+};
+
   
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-[#ABAFB5]/30 hover:shadow-xl transition-all duration-300 group flex flex-col h-full hover:border-[#2596be]/30">

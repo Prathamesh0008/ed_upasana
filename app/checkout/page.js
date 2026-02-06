@@ -1,855 +1,973 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { 
-  CreditCard, Lock, Shield, Truck, Home, Mail, Phone, 
-  User, MapPin, Calendar, AlertCircle, CheckCircle,
-  ArrowLeft, Package, CreditCard as CardIcon, Landmark, Smartphone
-} from 'lucide-react';
+
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useCart } from "../context/CartContext";
+import {
+  User,
+  MapPin,
+  CreditCard,
+  Lock,
+  ArrowLeft,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  ChevronRight,
+  Shield,
+  Truck,
+  Package,
+  Phone,
+  Mail,
+  Home,
+  ShoppingBag,
+} from "lucide-react";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { cartItems, cartTotal, clearCart } = useCart();
+
+  const [step, setStep] = useState(1);
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [orderNumber, setOrderNumber] = useState('');
-  
-  // Form states
+  const [orderNumber, setOrderNumber] = useState("");
+  const [showCardDetails, setShowCardDetails] = useState(false);
+  const [showAllInfo, setShowAllInfo] = useState(true);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: 'United States',
-    
-    // Payment
-    cardNumber: '',
-    cardName: '',
-    expiryDate: '',
-    cvv: '',
-    paymentMethod: 'credit_card',
-    
-    // Shipping
-    shippingMethod: 'standard',
-    sameAsBilling: true,
-    
-    // Prescription verification
-    prescriptionVerified: false,
-    doctorName: '',
-    doctorLicense: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    paymentMethod: "credit_card",
+    cardNumber: "",
+    cardName: "",
+    expiryDate: "",
+    cvv: "",
   });
-  
-  // Validation errors
-  const [errors, setErrors] = useState({});
-  
+
   // Color palette
   const colors = {
-    primary: '#2596be',
-    secondary: '#ABAFB5',
-    accent: '#677E8A',
-    danger: '#622347',
-    dark: '#122E34',
-    darkest: '#0E1D21',
-    light: '#f8f9fa'
+    primary: "#2596be",      // Blue
+    secondary: "#ABAFB5",    // Light Gray
+    accent: "#677E8A",       // Gray Blue
+    dark: "#622347",         // Purple Maroon
+    darkBlue: "#122E34",     // Dark Blue
+    darkest: "#0E1D21",      // Almost Black
   };
 
-  // Load cart from localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem('shoppingCart');
-    if (savedCart) {
-      try {
-        const items = JSON.parse(savedCart);
-        setCartItems(items);
-        
-        // If cart is empty, redirect to cart page
-        if (items.length === 0) {
-          router.push('/cart');
-        }
-      } catch (error) {
-        console.error('Error loading cart:', error);
-      }
+    if (cartItems.length === 0 && !orderPlaced) {
+      router.push("/cart");
     }
-    setLoading(false);
-  }, [router]);
+  }, [cartItems, router, orderPlaced]);
 
-  // Calculate totals
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = formData.shippingMethod === 'express' ? 99.99 : 
-                  subtotal > 5000 ? 0 : 49.99;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const subtotal = cartTotal;
   const tax = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
+  const shipping = subtotal > 50 ? 0 : 9.99;
+  const total = subtotal + tax + shipping;
 
-  // Shipping methods
-  const shippingMethods = [
-    { id: 'standard', name: 'Standard Shipping', cost: subtotal > 5000 ? 'FREE' : '$49.99', delivery: '3-5 business days' },
-    { id: 'express', name: 'Express Shipping', cost: '$99.99', delivery: '1-2 business days' },
-    { id: 'overnight', name: 'Overnight Shipping', cost: '$149.99', delivery: 'Next business day' }
-  ];
-
-  // Payment methods
-  const paymentMethods = [
-    { id: 'credit_card', name: 'Credit Card', icon: CardIcon },
-    { id: 'bank_transfer', name: 'Bank Transfer', icon: Landmark },
-    { id: 'digital_wallet', name: 'Digital Wallet', icon: Smartphone }
-  ];
-
-  // Handle form input changes
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  // Validate form
-  const validateForm = () => {
-    const newErrors = {};
-    
-    // Required fields
-    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'zipCode'];
-    requiredFields.forEach(field => {
-      if (!formData[field].trim()) {
-        newErrors[field] = 'This field is required';
-      }
-    });
-    
-    // Email validation
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    
-    // Phone validation
-    if (formData.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\D/g, ''))) {
-      newErrors.phone = 'Please enter a valid phone number';
-    }
-    
-    // Payment validation
-    if (formData.paymentMethod === 'credit_card') {
-      if (!formData.cardNumber.replace(/\s/g, '').match(/^\d{16}$/)) {
-        newErrors.cardNumber = 'Please enter a valid 16-digit card number';
-      }
-      if (!formData.cardName.trim()) {
-        newErrors.cardName = 'Cardholder name is required';
-      }
-      if (!formData.expiryDate.match(/^(0[1-9]|1[0-2])\/\d{2}$/)) {
-        newErrors.expiryDate = 'Please use MM/YY format';
-      }
-      if (!formData.cvv.match(/^\d{3,4}$/)) {
-        newErrors.cvv = 'Please enter a valid CVV';
-      }
-    }
-    
-    // Check for prescription items
-    const hasPrescriptionItems = cartItems.some(item => item.requiresPrescription);
-    if (hasPrescriptionItems && !formData.prescriptionVerified) {
-      newErrors.prescriptionVerified = 'Prescription verification is required for prescription medications';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    // Generate order number
-    const generatedOrderNumber = `ORD-${Date.now().toString().slice(-8)}`;
-    setOrderNumber(generatedOrderNumber);
-    
-    // In a real app, you would send this data to your backend
-    const orderData = {
-      ...formData,
-      cartItems,
-      subtotal,
-      shipping,
-      tax,
-      total,
-      orderNumber: generatedOrderNumber,
-      timestamp: new Date().toISOString()
-    };
-    
-    // Save order to localStorage (simulating backend)
-    const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-    existingOrders.push(orderData);
-    localStorage.setItem('orders', JSON.stringify(existingOrders));
-    
-    // Clear cart
-    localStorage.removeItem('shoppingCart');
-    setCartItems([]);
-    
-    // Show success
+  const placeOrder = () => {
+    const orderId = `ORD-${Date.now().toString().slice(-8)}`;
+    setOrderNumber(orderId);
+    clearCart();
     setOrderPlaced(true);
+    setFormSubmitted(true);
   };
 
-  // Format card number
-  const formatCardNumber = (value) => {
-    return value.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ');
+  const handleStepContinue = () => {
+    if (step < 4) {
+      setStep(step + 1);
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2596be]"></div>
-      </div>
-    );
-  }
+  const handleStepBack = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    } else {
+      router.push("/cart");
+    }
+  };
+
+  const maskCardNumber = (cardNumber) => {
+    if (!cardNumber) return "•••• •••• •••• ••••";
+    return cardNumber.replace(/\d(?=\d{4})/g, "•");
+  };
+
+  const maskCVV = (cvv) => {
+    if (!cvv) return "•••";
+    return "•".repeat(cvv.length);
+  };
+
+  // Format phone number
+  const formatPhone = (phone) => {
+    if (!phone) return "";
+    return phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
+  };
 
   if (orderPlaced) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-xl p-8 text-center border border-[#ABAFB5]/20">
-              <div className="w-20 h-20 bg-[#2596be]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="text-[#2596be]" size={48} />
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50 p-10 rounded-2xl shadow-2xl text-center max-w-md border border-[#2596be]/20">
+          <div className="relative">
+            <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-r from-[#2596be] to-[#122E34] rounded-full blur-xl opacity-20"></div>
+            <div className="absolute -bottom-10 -left-10 w-20 h-20 bg-gradient-to-r from-[#622347] to-[#122E34] rounded-full blur-xl opacity-20"></div>
+            <CheckCircle size={80} className="mx-auto text-[#2596be] mb-6 animate-pulse" />
+          </div>
+          <h1 className="text-3xl font-bold mb-3 bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
+            Order Confirmed!
+          </h1>
+          <p className="text-gray-600 mb-2">Thank you for your purchase!</p>
+          <div className="bg-gradient-to-r from-blue-50 to-gray-50 p-6 rounded-xl border border-[#2596be]/30 mb-8">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <Package className="text-[#2596be]" size={24} />
+              <p className="font-semibold text-gray-800">Order ID:</p>
+            </div>
+            <p className="text-2xl font-bold text-gray-900 tracking-wider font-mono">{orderNumber}</p>
+          </div>
+          
+          <div className="space-y-4 mb-8 text-left bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <Truck className="text-[#677E8A]" size={20} />
+              <h3 className="font-semibold text-gray-800">Order Details</h3>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Estimated Delivery:</span>
+                <span className="font-semibold text-gray-800">3-5 Business Days</span>
               </div>
-              
-              <h1 className="text-3xl font-bold text-[#0E1D21] mb-4">Order Confirmed!</h1>
-              <p className="text-[#677E8A] mb-6">
-                Thank you for your order. Your order number is:
-              </p>
-              
-              <div className="bg-[#122E34]/5 border border-[#122E34]/10 rounded-xl p-4 mb-6">
-                <p className="text-xl font-bold text-[#2596be]">{orderNumber}</p>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Shipping to:</span>
+                <span className="font-semibold text-gray-800 text-right">
+                  {formData.city}, {formData.state}
+                </span>
               </div>
-              
-              <div className="space-y-4 mb-8">
-                <div className="flex justify-between items-center">
-                  <span className="text-[#677E8A]">Items Total</span>
-                  <span className="font-semibold">${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[#677E8A]">Shipping</span>
-                  <span className="font-semibold">${shipping.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center text-lg font-bold border-t pt-4">
-                  <span className="text-[#0E1D21]">Total</span>
-                  <span className="text-[#2596be]">${total.toFixed(2)}</span>
-                </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Contact:</span>
+                <span className="font-semibold text-gray-800">{formatPhone(formData.phone)}</span>
               </div>
-              
-              <div className="bg-[#2596be]/10 border border-[#2596be]/20 rounded-xl p-4 mb-6">
-                <p className="text-sm text-[#122E34]">
-                  A confirmation email has been sent to <strong>{formData.email}</strong>. 
-                  You will receive tracking information once your order ships.
-                </p>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={() => router.push('/')}
-                  className="flex-1 bg-[#2596be] hover:bg-[#122E34] text-white py-3 rounded-lg font-semibold transition"
-                >
-                  Continue Shopping
-                </button>
-                <button
-                  onClick={() => router.push('/orders')}
-                  className="flex-1 bg-white border border-[#ABAFB5] hover:border-[#677E8A] text-[#0E1D21] py-3 rounded-lg font-semibold transition"
-                >
-                  View Order Details
-                </button>
+              <div className="flex justify-between items-center pt-3 border-t border-gray-200">
+                <span className="text-gray-600 text-lg">Total Amount:</span>
+                <span className="font-bold text-xl bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
+                  ${total.toFixed(2)}
+                </span>
               </div>
             </div>
           </div>
+          
+          <button
+            onClick={() => router.push("/products")}
+            className="w-full bg-gradient-to-r from-[#2596be] to-[#122E34] text-white py-4 rounded-xl font-semibold hover:from-[#2596be] hover:to-[#0E1D21] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            Continue Shopping
+          </button>
+          
+          <p className="text-gray-600 text-sm mt-6">
+            A confirmation email has been sent to{" "}
+            <span className="text-[#2596be] font-semibold">{formData.email}</span>
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-white py-10 px-4">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => router.push('/cart')}
-            className="flex items-center gap-2 text-[#2596be] hover:text-[#122E34] mb-4"
+            onClick={handleStepBack}
+            className="flex items-center gap-2 text-[#2596be] hover:text-[#677E8A] font-semibold mb-6 group transition-colors"
           >
-            <ArrowLeft size={20} />
-            Back to Cart
+            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+            Back {step > 1 && `to Step ${step - 1}`}
           </button>
-          
-          <h1 className="text-3xl font-bold text-[#0E1D21] mb-2">Checkout</h1>
-          <p className="text-[#677E8A]">Complete your order securely</p>
-        </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Forms */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Contact Information */}
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-[#ABAFB5]/20">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-[#2596be]/10 rounded-full flex items-center justify-center">
-                    <User className="text-[#2596be]" size={20} />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-[#0E1D21]">Contact Information</h2>
-                    <p className="text-sm text-[#677E8A]">We'll use this to contact you about your order</p>
-                  </div>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-[#2596be] via-[#677E8A] to-[#122E34] bg-clip-text text-transparent mb-2">
+                Checkout
+              </h1>
+              <p className="text-gray-600">Complete your purchase in 4 easy steps</p>
+            </div>
+            
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-[#2596be]/10 to-[#122E34]/10 rounded-lg">
+                  <ShoppingBag className="text-[#2596be]" size={20} />
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                      First Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-lg border ${
-                        errors.firstName 
-                          ? 'border-[#622347] focus:border-[#622347]' 
-                          : 'border-[#ABAFB5] focus:border-[#2596be]'
-                      } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                      placeholder="John"
-                    />
-                    {errors.firstName && (
-                      <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                        <AlertCircle size={14} />
-                        {errors.firstName}
-                      </p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                      Last Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-lg border ${
-                        errors.lastName 
-                          ? 'border-[#622347] focus:border-[#622347]' 
-                          : 'border-[#ABAFB5] focus:border-[#2596be]'
-                      } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                      placeholder="Doe"
-                    />
-                    {errors.lastName && (
-                      <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                        <AlertCircle size={14} />
-                        {errors.lastName}
-                      </p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-lg border ${
-                        errors.email 
-                          ? 'border-[#622347] focus:border-[#622347]' 
-                          : 'border-[#ABAFB5] focus:border-[#2596be]'
-                      } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                      placeholder="john@example.com"
-                    />
-                    {errors.email && (
-                      <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                        <AlertCircle size={14} />
-                        {errors.email}
-                      </p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-lg border ${
-                        errors.phone 
-                          ? 'border-[#622347] focus:border-[#622347]' 
-                          : 'border-[#ABAFB5] focus:border-[#2596be]'
-                      } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                      placeholder="+1 (555) 123-4567"
-                    />
-                    {errors.phone && (
-                      <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                        <AlertCircle size={14} />
-                        {errors.phone}
-                      </p>
-                    )}
-                  </div>
+                <div className="text-right">
+                  <p className="text-gray-600 text-sm">Items in Cart</p>
+                  <p className="font-bold text-gray-900 text-xl">{cartItems.length}</p>
                 </div>
               </div>
-
-              {/* Shipping Address */}
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-[#ABAFB5]/20">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-[#2596be]/10 rounded-full flex items-center justify-center">
-                    <MapPin className="text-[#2596be]" size={20} />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-[#0E1D21]">Shipping Address</h2>
-                    <p className="text-sm text-[#677E8A]">Where should we deliver your order?</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                      Street Address *
-                    </label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-lg border ${
-                        errors.address 
-                          ? 'border-[#622347] focus:border-[#622347]' 
-                          : 'border-[#ABAFB5] focus:border-[#2596be]'
-                      } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                      placeholder="123 Main Street"
-                    />
-                    {errors.address && (
-                      <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                        <AlertCircle size={14} />
-                        {errors.address}
-                      </p>
-                    )}
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                        City *
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        className={`w-full px-4 py-3 rounded-lg border ${
-                          errors.city 
-                            ? 'border-[#622347] focus:border-[#622347]' 
-                            : 'border-[#ABAFB5] focus:border-[#2596be]'
-                        } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                        placeholder="New York"
-                      />
-                      {errors.city && (
-                        <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                          <AlertCircle size={14} />
-                          {errors.city}
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                        State *
-                      </label>
-                      <input
-                        type="text"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleInputChange}
-                        className={`w-full px-4 py-3 rounded-lg border ${
-                          errors.state 
-                            ? 'border-[#622347] focus:border-[#622347]' 
-                            : 'border-[#ABAFB5] focus:border-[#2596be]'
-                        } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                        placeholder="NY"
-                      />
-                      {errors.state && (
-                        <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                          <AlertCircle size={14} />
-                          {errors.state}
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                        ZIP Code *
-                      </label>
-                      <input
-                        type="text"
-                        name="zipCode"
-                        value={formData.zipCode}
-                        onChange={handleInputChange}
-                        className={`w-full px-4 py-3 rounded-lg border ${
-                          errors.zipCode 
-                            ? 'border-[#622347] focus:border-[#622347]' 
-                            : 'border-[#ABAFB5] focus:border-[#2596be]'
-                        } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                        placeholder="10001"
-                      />
-                      {errors.zipCode && (
-                        <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                          <AlertCircle size={14} />
-                          {errors.zipCode}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Method */}
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-[#ABAFB5]/20">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-[#2596be]/10 rounded-full flex items-center justify-center">
-                    <CreditCard className="text-[#2596be]" size={20} />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-[#0E1D21]">Payment Method</h2>
-                    <p className="text-sm text-[#677E8A]">How would you like to pay?</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-6">
-                  {/* Payment Method Selection */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    {paymentMethods.map((method) => (
-                      <button
-                        key={method.id}
-                        type="button"
-                        onClick={() => handleInputChange({
-                          target: { name: 'paymentMethod', value: method.id }
-                        })}
-                        className={`p-4 rounded-xl border-2 text-left transition ${
-                          formData.paymentMethod === method.id
-                            ? 'border-[#2596be] bg-[#2596be]/5'
-                            : 'border-[#ABAFB5] hover:border-[#677E8A]'
-                        }`}
-                      >
-                        <method.icon className="text-[#677E8A] mb-2" size={24} />
-                        <div className="font-medium text-[#0E1D21]">{method.name}</div>
-                      </button>
-                    ))}
-                  </div>
-                  
-                  {/* Credit Card Details */}
-                  {formData.paymentMethod === 'credit_card' && (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                          Card Number *
-                        </label>
-                        <input
-                          type="text"
-                          name="cardNumber"
-                          value={formData.cardNumber}
-                          onChange={(e) => {
-                            const formatted = formatCardNumber(e.target.value);
-                            handleInputChange({
-                              target: { name: 'cardNumber', value: formatted }
-                            });
-                          }}
-                          maxLength={19}
-                          className={`w-full px-4 py-3 rounded-lg border ${
-                            errors.cardNumber 
-                              ? 'border-[#622347] focus:border-[#622347]' 
-                              : 'border-[#ABAFB5] focus:border-[#2596be]'
-                          } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                          placeholder="1234 5678 9012 3456"
-                        />
-                        {errors.cardNumber && (
-                          <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                            <AlertCircle size={14} />
-                            {errors.cardNumber}
-                          </p>
-                        )}
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                            Cardholder Name *
-                          </label>
-                          <input
-                            type="text"
-                            name="cardName"
-                            value={formData.cardName}
-                            onChange={handleInputChange}
-                            className={`w-full px-4 py-3 rounded-lg border ${
-                              errors.cardName 
-                                ? 'border-[#622347] focus:border-[#622347]' 
-                                : 'border-[#ABAFB5] focus:border-[#2596be]'
-                            } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                            placeholder="John Doe"
-                          />
-                          {errors.cardName && (
-                            <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                              <AlertCircle size={14} />
-                              {errors.cardName}
-                            </p>
-                          )}
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                              Expiry Date *
-                            </label>
-                            <input
-                              type="text"
-                              name="expiryDate"
-                              value={formData.expiryDate}
-                              onChange={handleInputChange}
-                              className={`w-full px-4 py-3 rounded-lg border ${
-                                errors.expiryDate 
-                                  ? 'border-[#622347] focus:border-[#622347]' 
-                                  : 'border-[#ABAFB5] focus:border-[#2596be]'
-                              } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                              placeholder="MM/YY"
-                            />
-                            {errors.expiryDate && (
-                              <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                                <AlertCircle size={14} />
-                                {errors.expiryDate}
-                              </p>
-                            )}
-                          </div>
-                          
-                          <div>
-                            <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                              CVV *
-                            </label>
-                            <input
-                              type="text"
-                              name="cvv"
-                              value={formData.cvv}
-                              onChange={handleInputChange}
-                              className={`w-full px-4 py-3 rounded-lg border ${
-                                errors.cvv 
-                                  ? 'border-[#622347] focus:border-[#622347]' 
-                                  : 'border-[#ABAFB5] focus:border-[#2596be]'
-                              } focus:ring-2 focus:ring-[#2596be]/20 outline-none transition`}
-                              placeholder="123"
-                              maxLength={4}
-                            />
-                            {errors.cvv && (
-                              <p className="mt-2 text-sm text-[#622347] flex items-center gap-1">
-                                <AlertCircle size={14} />
-                                {errors.cvv}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+              
+              <div className="hidden md:block">
+                <p className="text-gray-600 text-sm">Total Amount</p>
+                <p className="text-2xl font-bold bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
+                  ${total.toFixed(2)}
+                </p>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Right Column - Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-8 space-y-8">
-                {/* Order Summary */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-[#ABAFB5]/20">
-                  <h2 className="text-xl font-bold text-[#0E1D21] mb-6">Order Summary</h2>
-                  
-                  {/* Cart Items */}
-                  <div className="space-y-4 mb-6">
-                    {cartItems.map((item) => (
-                      <div key={item.id} className="flex justify-between items-start">
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-[#0E1D21] truncate">{item.name}</p>
-                          <p className="text-sm text-[#677E8A]">Qty: {item.quantity}</p>
-                        </div>
-                        <p className="font-semibold text-[#0E1D21] whitespace-nowrap ml-2">
-                          ${(item.price * item.quantity).toFixed(2)}
-                        </p>
-                      </div>
-                    ))}
+        {/* STEP INDICATOR */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+          {[
+            { number: 1, label: "Contact", icon: <User size={18} />, desc: "Your information", color: "from-[#2596be] to-[#677E8A]" },
+            { number: 2, label: "Shipping", icon: <MapPin size={18} />, desc: "Delivery address", color: "from-[#622347] to-[#2596be]" },
+            { number: 3, label: "Payment", icon: <CreditCard size={18} />, desc: "Payment method", color: "from-[#677E8A] to-[#122E34]" },
+            { number: 4, label: "Review", icon: <Lock size={18} />, desc: "Confirm order", color: "from-[#2596be] to-[#622347]" },
+          ].map((item) => (
+            <button
+              key={item.number}
+              onClick={() => step >= item.number && setStep(item.number)}
+              className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-300 border ${
+                step === item.number
+                  ? `bg-gradient-to-r ${item.color} border-white shadow-lg shadow-[#2596be]/20`
+                  : step > item.number
+                  ? "bg-gradient-to-r from-gray-50 to-blue-50 border-gray-200"
+                  : "bg-gray-50 border-gray-200"
+              }`}
+            >
+              <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+                step === item.number
+                  ? "bg-white/20 text-white"
+                  : step > item.number
+                  ? `bg-gradient-to-r ${item.color} text-white`
+                  : "bg-gray-200 text-gray-600"
+              }`}>
+                {step > item.number ? <CheckCircle size={20} /> : item.icon}
+              </div>
+              <div className="text-left">
+                <div className="flex items-center gap-2">
+                  <span className={`font-semibold ${
+                    step === item.number ? "text-white" : step > item.number ? "text-gray-900" : "text-gray-600"
+                  }`}>
+                    Step {item.number}
+                  </span>
+                  <span className={`hidden md:inline text-sm ${
+                    step === item.number ? "text-white" : "text-gray-700"
+                  }`}>
+                    {item.label}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 hidden md:block">{item.desc}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* LEFT COLUMN - Main Form */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* STEP 1: Contact Info */}
+            {step === 1 && (
+              <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-r from-[#2596be] to-[#677E8A] rounded-xl">
+                      <User size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold bg-gradient-to-r from-[#2596be] to-[#122E34] bg-clip-text text-transparent">
+                        Contact Information
+                      </h2>
+                      <p className="text-gray-600">We'll use this to contact you about your order</p>
+                    </div>
                   </div>
-                  
-                  {/* Totals */}
-                  <div className="space-y-3 border-t pt-4">
-                    <div className="flex justify-between">
-                      <span className="text-[#677E8A]">Subtotal</span>
-                      <span className="font-medium">${subtotal.toFixed(2)}</span>
+                  <div className="hidden md:flex items-center gap-2 text-sm text-[#2596be]">
+                    <Shield size={16} />
+                    <span>Secure form</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">First Name *</label>
+                    <input
+                      placeholder="John"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Last Name *</label>
+                    <input
+                      placeholder="Doe"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-gray-700 mb-2 font-medium">Email Address *</label>
+                    <div className="relative">
+                      <Mail size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <input
+                        placeholder="john@example.com"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full p-4 pl-12 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all"
+                      />
                     </div>
-                    
-                    {/* Shipping Method */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[#677E8A]">Shipping</span>
-                        <select
-                          name="shippingMethod"
-                          value={formData.shippingMethod}
-                          onChange={handleInputChange}
-                          className="bg-transparent border border-[#ABAFB5] rounded px-2 py-1 text-sm focus:outline-none focus:border-[#2596be]"
-                        >
-                          {shippingMethods.map((method) => (
-                            <option key={method.id} value={method.id}>
-                              {method.name} ({method.cost})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <p className="text-xs text-[#677E8A]">
-                        {shippingMethods.find(m => m.id === formData.shippingMethod)?.delivery}
-                      </p>
-                    </div>
-                    
-                    <div className="flex justify-between">
-                      <span className="text-[#677E8A]">Tax (8%)</span>
-                      <span className="font-medium">${tax.toFixed(2)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between text-lg font-bold border-t pt-4">
-                      <span className="text-[#0E1D21]">Total</span>
-                      <span className="text-[#2596be]">${total.toFixed(2)}</span>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-gray-700 mb-2 font-medium">Phone Number *</label>
+                    <div className="relative">
+                      <Phone size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <input
+                        placeholder="(555) 123-4567"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full p-4 pl-12 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all"
+                      />
                     </div>
                   </div>
                 </div>
 
-                {/* Prescription Verification */}
-                {cartItems.some(item => item.requiresPrescription) && (
-                  <div className="bg-white rounded-xl shadow-lg p-6 border border-[#ABAFB5]/20">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Shield className="text-[#2596be]" size={24} />
-                      <h3 className="font-bold text-[#0E1D21]">Prescription Verification</h3>
+                {/* Contact Info Preview */}
+                {showAllInfo && (formData.firstName || formData.email) && (
+                  <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-gray-50 rounded-xl border border-[#2596be]/30">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
+                        Contact Information Preview
+                      </h3>
+                      <Eye className="text-[#2596be]" size={20} />
                     </div>
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          id="prescriptionVerified"
-                          name="prescriptionVerified"
-                          checked={formData.prescriptionVerified}
-                          onChange={handleInputChange}
-                          className="mt-1"
-                        />
-                        <div>
-                          <label htmlFor="prescriptionVerified" className="font-medium text-[#0E1D21]">
-                            I confirm I have a valid prescription for all prescription medications
-                          </label>
-                          <p className="text-sm text-[#677E8A] mt-1">
-                            Required for: {cartItems.filter(item => item.requiresPrescription).map(item => item.name).join(', ')}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      {formData.prescriptionVerified && (
-                        <div className="space-y-4 p-4 bg-[#2596be]/5 rounded-lg">
-                          <div>
-                            <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                              Doctor's Name
-                            </label>
-                            <input
-                              type="text"
-                              name="doctorName"
-                              value={formData.doctorName}
-                              onChange={handleInputChange}
-                              className="w-full px-3 py-2 rounded-lg border border-[#ABAFB5] focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none"
-                              placeholder="Dr. Smith"
-                            />
-                          </div>
-                          
-                          <div>
-                            <label className="block text-sm font-medium text-[#0E1D21] mb-2">
-                              License Number (Optional)
-                            </label>
-                            <input
-                              type="text"
-                              name="doctorLicense"
-                              value={formData.doctorLicense}
-                              onChange={handleInputChange}
-                              className="w-full px-3 py-2 rounded-lg border border-[#ABAFB5] focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none"
-                              placeholder="MD123456"
-                            />
-                          </div>
-                        </div>
-                      )}
-                      
-                      {errors.prescriptionVerified && (
-                        <p className="text-sm text-[#622347] flex items-center gap-2">
-                          <AlertCircle size={14} />
-                          {errors.prescriptionVerified}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-600">Name</p>
+                        <p className="font-semibold text-gray-900">
+                          {formData.firstName} {formData.lastName}
                         </p>
-                      )}
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Email</p>
+                        <p className="font-semibold text-gray-900">{formData.email || "Not provided"}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Phone</p>
+                        <p className="font-semibold text-gray-900">{formatPhone(formData.phone) || "Not provided"}</p>
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* Terms and Submit */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-[#ABAFB5]/20">
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3">
+                <button
+                  onClick={handleStepContinue}
+                  className="mt-8 w-full bg-gradient-to-r from-[#2596be] to-[#122E34] text-white py-4 rounded-xl font-semibold hover:from-[#2596be] hover:to-[#0E1D21] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
+                >
+                  Continue to Shipping
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            )}
+
+            {/* STEP 2: Shipping Address */}
+            {step === 2 && (
+              <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-r from-[#622347] to-[#2596be] rounded-xl">
+                      <MapPin size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold bg-gradient-to-r from-[#622347] to-[#122E34] bg-clip-text text-transparent">
+                        Shipping Address
+                      </h2>
+                      <p className="text-gray-600">Where should we deliver your order?</p>
+                    </div>
+                  </div>
+                  <div className="hidden md:flex items-center gap-2 text-sm text-[#622347]">
+                    <Truck size={16} />
+                    <span>Fast delivery</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-gray-700 mb-2 font-medium">Street Address *</label>
+                    <div className="relative">
+                      <Home size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
                       <input
-                        type="checkbox"
-                        id="terms"
-                        required
-                        className="mt-1"
+                        placeholder="123 Main Street"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        className="w-full p-4 pl-12 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all"
                       />
-                      <div>
-                        <label htmlFor="terms" className="font-medium text-[#0E1D21]">
-                          I agree to the Terms & Conditions and Privacy Policy
-                        </label>
-                        <p className="text-sm text-[#677E8A] mt-1">
-                          By placing this order, you agree to our terms of service.
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">City *</label>
+                    <input
+                      placeholder="New York"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleChange}
+                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">State *</label>
+                    <input
+                      placeholder="NY"
+                      name="state"
+                      value={formData.state}
+                      onChange={handleChange}
+                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-gray-700 mb-2 font-medium">ZIP Code *</label>
+                    <input
+                      placeholder="10001"
+                      name="zipCode"
+                      value={formData.zipCode}
+                      onChange={handleChange}
+                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Shipping Preview */}
+                {showAllInfo && (
+                  <div className="mt-8 space-y-4">
+                    <div className="p-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-[#622347]/30">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-semibold bg-gradient-to-r from-[#622347] to-[#2596be] bg-clip-text text-transparent">
+                          Shipping Address Preview
+                        </h3>
+                        <MapPin className="text-[#622347]" size={20} />
+                      </div>
+                      <p className="text-gray-900 font-medium">{formData.address || "Not provided"}</p>
+                      <p className="text-gray-600">
+                        {formData.city || "City"}, {formData.state || "State"} {formData.zipCode || "ZIP"}
+                      </p>
+                    </div>
+                    
+                    {formData.firstName && (
+                      <div className="p-6 bg-gradient-to-r from-blue-50 to-gray-50 rounded-xl border border-[#2596be]/30">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-semibold bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
+                            Contact Information
+                          </h3>
+                          <User className="text-[#2596be]" size={20} />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm text-gray-600">Name</p>
+                            <p className="font-semibold text-gray-900">{formData.firstName} {formData.lastName}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Email</p>
+                            <p className="font-semibold text-gray-900">{formData.email}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <button
+                  onClick={handleStepContinue}
+                  className="mt-8 w-full bg-gradient-to-r from-[#622347] to-[#122E34] text-white py-4 rounded-xl font-semibold hover:from-[#622347] hover:to-[#0E1D21] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
+                >
+                  Continue to Payment
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            )}
+
+            {/* STEP 3: Payment */}
+            {step === 3 && (
+              <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-r from-[#677E8A] to-[#122E34] rounded-xl">
+                      <CreditCard size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold bg-gradient-to-r from-[#677E8A] to-[#122E34] bg-clip-text text-transparent">
+                        Payment Details
+                      </h2>
+                      <p className="text-gray-600">Secure payment processing</p>
+                    </div>
+                  </div>
+                  <div className="hidden md:flex items-center gap-2 text-sm text-[#677E8A]">
+                    <Shield size={16} />
+                    <span>256-bit encrypted</span>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Card Number *</label>
+                    <div className="relative">
+                      <CreditCard size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <input
+                        placeholder="1234 5678 9012 3456"
+                        name="cardNumber"
+                        value={showCardDetails ? formData.cardNumber : maskCardNumber(formData.cardNumber)}
+                        onChange={handleChange}
+                        type={showCardDetails ? "text" : "password"}
+                        className="w-full p-4 pl-12 pr-12 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCardDetails(!showCardDetails)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                      >
+                        {showCardDetails ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Cardholder Name *</label>
+                    <input
+                      placeholder="JOHN DOE"
+                      name="cardName"
+                      value={formData.cardName}
+                      onChange={handleChange}
+                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-gray-700 mb-2 font-medium">Expiry Date (MM/YY) *</label>
+                      <input
+                        placeholder="12/25"
+                        name="expiryDate"
+                        value={formData.expiryDate}
+                        onChange={handleChange}
+                        className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-700 mb-2 font-medium">CVV *</label>
+                      <div className="relative">
+                        <input
+                          placeholder="123"
+                          name="cvv"
+                          value={showCardDetails ? formData.cvv : maskCVV(formData.cvv)}
+                          onChange={handleChange}
+                          type={showCardDetails ? "text" : "password"}
+                          className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* All Information Preview */}
+                {showAllInfo && (
+                  <div className="mt-8 space-y-4">
+                    <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-[#677E8A]/30">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-semibold bg-gradient-to-r from-[#677E8A] to-[#122E34] bg-clip-text text-transparent">
+                          Payment Method
+                        </h3>
+                        <CreditCard className="text-[#677E8A]" size={20} />
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Card Number</span>
+                          <span className="font-semibold text-gray-900 font-mono">
+                            {showCardDetails ? formData.cardNumber : maskCardNumber(formData.cardNumber)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Cardholder</span>
+                          <span className="font-semibold text-gray-900">{formData.cardName || "Not provided"}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Expires</span>
+                          <span className="font-semibold text-gray-900">{formData.expiryDate || "Not provided"}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-gradient-to-r from-blue-50 to-gray-50 rounded-xl border border-[#2596be]/30">
+                        <p className="text-sm text-gray-600">Shipping Address</p>
+                        <p className="font-semibold text-gray-900 text-sm">
+                          {formData.address}, {formData.city}
                         </p>
                       </div>
-                    </div>
-                    
-                    {/* Security Badge */}
-                    <div className="flex items-center gap-3 p-3 bg-[#122E34]/5 rounded-lg">
-                      <Lock className="text-[#2596be]" size={18} />
-                      <div>
-                        <p className="text-sm font-medium text-[#122E34]">Secure Payment</p>
-                        <p className="text-xs text-[#677E8A]">256-bit SSL encryption</p>
+                      <div className="p-4 bg-gradient-to-r from-purple-50 to-gray-50 rounded-xl border border-[#622347]/30">
+                        <p className="text-sm text-gray-600">Contact</p>
+                        <p className="font-semibold text-gray-900 text-sm">{formData.email}</p>
                       </div>
                     </div>
-                    
-                    {/* Submit Button */}
-                    <button
-                      type="submit"
-                      className="w-full bg-[#2596be] hover:bg-[#122E34] text-white py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
-                    >
-                      <Lock size={20} />
-                      Place Order
-                      <ArrowLeft className="rotate-180" size={20} />
-                    </button>
-                    
-                    <p className="text-center text-sm text-[#677E8A]">
-                      You won't be charged until your order is verified
+                  </div>
+                )}
+
+                <button
+                  onClick={handleStepContinue}
+                  className="mt-8 w-full bg-gradient-to-r from-[#677E8A] to-[#122E34] text-white py-4 rounded-xl font-semibold hover:from-[#677E8A] hover:to-[#0E1D21] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
+                >
+                  Review Order
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            )}
+
+            {/* STEP 4: Review */}
+            {step === 4 && (
+              <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-r from-[#2596be] to-[#622347] rounded-xl">
+                      <Lock size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold bg-gradient-to-r from-[#2596be] via-[#622347] to-[#122E34] bg-clip-text text-transparent">
+                        Review & Place Order
+                      </h2>
+                      <p className="text-gray-600">Review all information before confirming</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Order Summary Preview */}
+                <div className="mb-8 space-y-6">
+                  {/* Contact Information */}
+                  <div className="p-6 bg-gradient-to-r from-blue-50 to-gray-50 rounded-xl border border-[#2596be]/30">
+                    <div className="flex items-center gap-3 mb-4">
+                      <User className="text-[#2596be]" size={20} />
+                      <h3 className="font-bold text-lg bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
+                        Contact Information
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-600">Full Name</p>
+                        <p className="font-semibold text-gray-900">{formData.firstName} {formData.lastName}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Email</p>
+                        <p className="font-semibold text-gray-900">{formData.email}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Phone</p>
+                        <p className="font-semibold text-gray-900">{formatPhone(formData.phone)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Shipping Address */}
+                  <div className="p-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-[#622347]/30">
+                    <div className="flex items-center gap-3 mb-4">
+                      <MapPin className="text-[#622347]" size={20} />
+                      <h3 className="font-bold text-lg bg-gradient-to-r from-[#622347] to-[#2596be] bg-clip-text text-transparent">
+                        Shipping Address
+                      </h3>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="font-semibold text-gray-900 text-lg">{formData.address}</p>
+                      <p className="text-gray-600">
+                        {formData.city}, {formData.state} {formData.zipCode}
+                      </p>
+                      <div className="flex items-center gap-2 mt-3">
+                        <Truck size={16} className="text-[#677E8A]" />
+                        <span className="text-sm text-gray-600">Estimated delivery: 3-5 business days</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment Method */}
+                  <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-[#677E8A]/30">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <CreditCard className="text-[#677E8A]" size={20} />
+                        <h3 className="font-bold text-lg bg-gradient-to-r from-[#677E8A] to-[#122E34] bg-clip-text text-transparent">
+                          Payment Method
+                        </h3>
+                      </div>
+                      <button
+                        onClick={() => setShowCardDetails(!showCardDetails)}
+                        className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                      >
+                        {showCardDetails ? <EyeOff size={16} className="text-gray-600" /> : <Eye size={16} className="text-gray-600" />}
+                        <span className="text-sm text-gray-600">
+                          {showCardDetails ? "Hide" : "Show"} Details
+                        </span>
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Card Number</span>
+                        <span className="font-semibold text-gray-900 font-mono">
+                          {showCardDetails ? formData.cardNumber : maskCardNumber(formData.cardNumber)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Cardholder Name</span>
+                        <span className="font-semibold text-gray-900">{formData.cardName}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Expiry Date</span>
+                        <span className="font-semibold text-gray-900">{formData.expiryDate}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 bg-gradient-to-r from-blue-50 to-gray-50 rounded-xl border border-[#2596be]/30 mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-lg bg-gradient-to-r from-[#2596be] to-[#122E34] bg-clip-text text-transparent">
+                      Order Total
+                    </h3>
+                    <p className="text-2xl font-bold bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
+                      ${total.toFixed(2)}
                     </p>
                   </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Subtotal</span>
+                      <span className="text-gray-900">${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Shipping</span>
+                      <span className={shipping === 0 ? "text-[#2596be] font-semibold" : "text-gray-900"}>
+                        {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Tax (8%)</span>
+                      <span className="text-gray-900">${tax.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={placeOrder}
+                  className="w-full bg-gradient-to-r from-[#2596be] via-[#622347] to-[#122E34] text-white py-4 rounded-xl font-bold hover:opacity-90 transition-all duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center gap-3 transform hover:-translate-y-1 text-lg group"
+                >
+                  <Lock size={22} className="group-hover:scale-110 transition-transform" />
+                  <span>Place Secure Order • ${total.toFixed(2)}</span>
+                </button>
+
+                <div className="flex items-center justify-center gap-2 mt-6 text-sm text-gray-600">
+                  <Shield size={16} className="text-[#2596be]" />
+                  <span>Your payment is secure and encrypted</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT COLUMN - Order Summary */}
+          <div className="space-y-8">
+            {/* Order Summary Card */}
+            <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
+                  Order Summary
+                </h3>
+                <Package className="text-[#2596be]" size={24} />
+              </div>
+
+              {/* Cart Items */}
+              <div className="space-y-4 mb-6 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                {cartItems.length === 0 ? (
+                  <div className="text-center py-8">
+                    <ShoppingBag className="mx-auto text-gray-400 mb-3" size={40} />
+                    <p className="text-gray-600">Your cart is empty</p>
+                    <button
+                      onClick={() => router.push("/products")}
+                      className="mt-4 px-4 py-2 bg-gradient-to-r from-[#2596be] to-[#122E34] text-white rounded-lg text-sm"
+                    >
+                      Continue Shopping
+                    </button>
+                  </div>
+                ) : (
+                  cartItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#2596be]/20 to-[#122E34]/20 rounded-lg flex items-center justify-center group-hover:from-[#2596be]/30 group-hover:to-[#122E34]/30 transition-all">
+                          <span className="font-bold text-[#2596be]">{item.quantity}</span>
+                        </div>
+                        <div className="max-w-[140px]">
+                          <p className="font-semibold text-gray-900 text-sm truncate">{item.name}</p>
+                          <p className="text-xs text-gray-600">${item.price.toFixed(2)} each</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-gray-900">${(item.price * item.quantity).toFixed(2)}</p>
+                        {item.quantity > 1 && (
+                          <p className="text-xs text-gray-500">
+                            {item.quantity} × ${item.price.toFixed(2)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Price Breakdown */}
+              <div className="space-y-3">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span>${subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Shipping</span>
+                  <span className={shipping === 0 ? "text-[#2596be] font-semibold" : ""}>
+                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                  </span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Tax (8%)</span>
+                  <span>${tax.toFixed(2)}</span>
+                </div>
+                <hr className="my-3 border-gray-300" />
+                <div className="flex justify-between items-center text-lg font-bold pt-2">
+                  <span className="text-gray-900">Total Amount</span>
+                  <span className="text-2xl bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
+                    ${total.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Progress Indicator */}
+              <div className="mt-6 pt-6 border-t border-gray-300">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-600">Checkout Progress</span>
+                  <span className="font-semibold text-[#2596be]">{step}/4 Steps</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-[#2596be] to-[#622347] h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(step / 4) * 100}%` }}
+                  ></div>
                 </div>
               </div>
             </div>
+
+            {/* Information Toggle */}
+            <div className="bg-gradient-to-r from-blue-50 to-gray-50 p-6 rounded-2xl shadow-xl border border-[#2596be]/20">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-lg bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
+                  Information Display
+                </h3>
+                <button
+                  onClick={() => setShowAllInfo(!showAllInfo)}
+                  className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                >
+                  {showAllInfo ? <EyeOff size={18} className="text-gray-600" /> : <Eye size={18} className="text-gray-600" />}
+                  <span className="text-sm text-gray-600">
+                    {showAllInfo ? "Hide Information" : "Show Information"}
+                  </span>
+                </button>
+              </div>
+              <p className="text-sm text-gray-600">
+                {showAllInfo
+                  ? "All entered information is currently visible for review."
+                  : "Information is hidden for privacy. Click 'Show Information' to review."}
+              </p>
+            </div>
+
+            {/* Security Badge */}
+            <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 rounded-2xl shadow-xl border border-[#2596be]/20">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-gradient-to-r from-[#2596be]/20 to-[#122E34]/20 rounded-lg">
+                  <Shield size={20} className="text-[#2596be]" />
+                </div>
+                <div>
+                  <h3 className="font-bold bg-gradient-to-r from-[#2596be] to-[#122E34] bg-clip-text text-transparent">
+                    Secure Checkout
+                  </h3>
+                  <p className="text-xs text-gray-600">256-bit SSL encryption</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">
+                Your payment information is encrypted and secure. We never store your full card details on our servers.
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="px-3 py-2 bg-white rounded-lg text-center border border-gray-300">
+                  <p className="text-xs text-gray-600">PCI DSS</p>
+                  <p className="text-xs font-semibold text-[#2596be]">Compliant</p>
+                </div>
+                <div className="px-3 py-2 bg-white rounded-lg text-center border border-gray-300">
+                  <p className="text-xs text-gray-600">SSL</p>
+                  <p className="text-xs font-semibold text-[#2596be]">256-bit</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Shipping Info */}
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-2xl shadow-xl border border-[#622347]/20">
+              <div className="flex items-center gap-3 mb-4">
+                <Truck size={20} className="text-[#622347]" />
+                <h3 className="font-bold bg-gradient-to-r from-[#622347] to-[#2596be] bg-clip-text text-transparent">
+                  Shipping Information
+                </h3>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600 text-sm">Delivery Time</span>
+                  <span className="font-semibold text-gray-900 text-sm">3-5 business days</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600 text-sm">Shipping Cost</span>
+                  <span className={`text-sm font-semibold ${shipping === 0 ? "text-[#2596be]" : "text-gray-900"}`}>
+                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                  </span>
+                </div>
+                {subtotal < 50 && (
+                  <div className="p-3 bg-gradient-to-r from-blue-50 to-gray-50 rounded-lg border border-[#2596be]/30">
+                    <p className="text-xs text-center text-[#2596be]">
+                      Add ${(50 - subtotal).toFixed(2)} more for free shipping!
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </form>
+        </div>
       </div>
+
+      {/* Custom Scrollbar Styles */}
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #2596be, #677E8A);
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(to bottom, #2596be, #122E34);
+        }
+      `}</style>
     </div>
   );
 }
