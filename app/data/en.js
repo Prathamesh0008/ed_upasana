@@ -1,5 +1,5 @@
 const products = {
-  "kamagra-gold-50-mg": {
+  "kamagra-gold-50": {
     id: "1",
     name: "Kamagra Gold 50 mg",
     category: "Kamagra Gold",
@@ -23,7 +23,7 @@ const products = {
     description:
       "Kamagra 50 mg containing the active ingredient, Sildenafil Citrate is used in the treatment of Erectile Dysfunction and Pulmonary Hypertension.",
 
-    slug: "kamagra-gold-50-mg",
+    slug: "kamagra-gold-50",
 
    overview: [
     "Kamagra Gold 50 mg contains Sildenafil Citrate, a clinically studied medication for erectile dysfunction.",
@@ -200,7 +200,7 @@ const products = {
    
   ]
   },
-  "kamagra-100mg-oral-jelly-vol1": {
+  "kamagra-100mg-oral-jelly": {
   id: "3",
   name: "Kamagra 100 mg Oral Jelly Vol 1 ",
   category: "Kamagra Oral Jelly",
@@ -420,7 +420,7 @@ const products = {
     "Use products responsibly and only under appropriate medical awareness."
   ]
 },
-"kamagra-polo-en": {
+"kamagra-polo": {
   id: "5",
   name: "Kamagra 100 mg polo",
   category: "Kamagra Polo",
@@ -679,7 +679,7 @@ const products = {
   ]
 },
 
-"kamagra-100mg-chewable-orange-en": {
+"kamagra-100mg-chewable-orange": {
   id: "7",
   name: "Kamagra-100 mg Chewable Tablet (Orange)",
   category: "Kamagra Chewable Tablet",
@@ -869,7 +869,7 @@ const products = {
     "Use only products sourced from reliable, legally authorized distributors to ensure safety and authenticity."
   ]
 },
-"kamagra-100mg-effervescent-en": {
+"kamagra-100mg-effervescent": {
   id: "8",
   name: "Kamagra-100 mg Effervescent",
   category: "Kamagra Effervescent",
@@ -1058,7 +1058,7 @@ const products = {
     "Support long-term vascular health through lifestyle choices like sleep, exercise, and stress management."
   ]
 },
-"super-kamagra-100-60-en": {
+"super-kamagra-100-60": {
   id: "9",
   name: "Super Kamagra",
   category: "Super Kamagra",
@@ -1253,7 +1253,7 @@ const products = {
   ]
 },
 
-"kamagra-expo-100mg-en": {
+"kamagra-expo-100mg": {
   id: "10",
   name: "Kamagra Expo 100 mg",
   category: "Kamagra Expo",
@@ -1443,7 +1443,7 @@ const products = {
     "Make sure the product details match what is officially listed by reputable sources."
   ]
 },
-"apcalis-sx-20mg-oral-jelly-en": {
+"apcalis-sx-20mg-oral-jelly": {
   id: "11",
   name: "Apcalis-SX 20 mg Oral Jelly",
   category: "Apcalis Oral Jelly",
@@ -1631,7 +1631,7 @@ const products = {
     "Report any unusual sensations or discomfort to a healthcare professional promptly."
   ]
 },
-"tadalis-sx-20mg-en": {
+"tadalis-sx-20mg": {
   id: "12",
   name: "Tadalis-SX 20 mg",
   category: "Tadalis-SX",
@@ -1820,7 +1820,7 @@ const products = {
     "Support your general wellness with consistent, healthy habits for long-term benefits."
   ]
 },
-"lovegra-100mg-oral-jelly-en": {
+"lovegra-100mg": {
   id: "13",
   name: "Lovegra 100 mg Oral Jelly",
   category: "Lovegra",
@@ -2197,7 +2197,7 @@ const products = {
     "Prioritize lifestyle habits that support healthy circulation such as movement, stress management, and proper sleep."
   ]
 },
-"valif-20mg-tablet-en": {
+"valif-20mg-tablet": {
   id: "15",
   name: "Valif 20 mg",
   category: "Valif",
@@ -2386,7 +2386,7 @@ const products = {
     "Store the product in its original blister to protect it from humidity."
   ]
 },
-"valif-20mg-oral-jelly-en": {
+"valif-20mg-oral-jelly": {
   id: "16",
   name: "Valif 20 mg Oral Jelly",
   category: "Valif Oral Jelly",
@@ -2576,7 +2576,7 @@ const products = {
     "Educate yourself about how Vardenafil interacts with body systems to make informed decisions."
   ]
 },
-"cenforce-25mg-en": {
+"cenforce-25mg": {
   id: "17",
   name: "Cenforce 25 mg",
   category: "Cenforce",
@@ -2766,7 +2766,7 @@ const products = {
     "Educate yourself on how Sildenafil interacts with your body for informed decision-making."
   ]
 },
-"cenforce-50mg-en": {
+"cenforce-50mg": {
   id: "18",
   name: "Cenforce 50 mg",
   category: "Cenforce",
@@ -2956,7 +2956,7 @@ const products = {
     "Stay informed about how Sildenafil interacts with your body to make responsible decisions."
   ]
 },
-"cenforce-100mg-en": {
+"cenforce-100mg": {
   id: "19",
   name: "Cenforce 100 mg",
   category: "Cenforce",
@@ -3144,7 +3144,7 @@ const products = {
     "Stay informed about how the active ingredient interacts with your system for smart, health-conscious decisions."
   ]
 },
-"cenforce-120mg-en": {
+"cenforce-120mg": {
   id: "20",
   name: "Cenforce 120 mg",
   category: "Cenforce",
@@ -3332,7 +3332,7 @@ const products = {
     "Stay informed about how Sildenafil interacts with your system so you can make responsible decisions."
   ]
 },
-"cenforce-130mg-en": {
+"cenforce-130mg": {
   id: "21",
   name: "Cenforce 130 mg",
   category: "Cenforce",
@@ -3520,7 +3520,7 @@ const products = {
     "Understand how Sildenafil interacts with your body to make informed decisions about your health."
   ]
 },
-"cenforce-150mg-en": {
+"cenforce-150mg": {
   id: "22",
   name: "Cenforce 150 mg",
   category: "Cenforce",
@@ -3710,7 +3710,7 @@ const products = {
     "When unsure about anything related to health, always seek professional medical guidance first."
   ]
 },
-"cenforce-200mg-en": {
+"cenforce-200mg": {
   id: "23",
   name: "Cenforce 200 mg",
   brand: "ED Centurion Remedies",
@@ -4083,7 +4083,7 @@ const products = {
     "Prioritize balanced diet, sleep, and fitness for long-term health benefits."
   ]
 },
-"cenforce-d-100-60-en": {
+"cenforce-d-100-60": {
   id: "25",
   name: "Cenforce-D",
   category: "Cenforce-D",
@@ -4275,7 +4275,7 @@ const products = {
     "If you are unsure about suitability, a healthcare expert should be your first point of clarification."
   ]
 },
-"cenforce-fm-100-en": {
+"cenforce-fm-100mg": {
   id: "26",
   name: "Cenforce-FM",
   category: "Cenforce FM",
@@ -4463,7 +4463,7 @@ const products = {
     "Keep awareness of your personal wellness goals and how different products align with them."
   ]
 },
-"cenforce-professional-en": {
+"cenforce-professional": {
   id: "27",
   name: "Cenforce Professional",
   category: "Cenforce Professional",
@@ -4652,7 +4652,7 @@ const products = {
     "When unsure about suitability, always rely on professional medical advice."
   ]
 },
-"cenforce-oral-jelly-100-en": {
+"cenforce-oral-jelly-100mg": {
   id: "28",
   name: "Cenforce Oral Jelly 100 mg",
   category: "Cenforce Oral Jelly",
@@ -4836,7 +4836,7 @@ const products = {
     "Maintain general wellness — hydration, sleep, nutrition — as it supports healthy bodily functions."
   ]
 },
-"vidalista-2-5mg-en": {
+"vidalista-2-5mg": {
   id: "29",
   name: "Vidalista 2.5 mg",
   category: "Vidalista",
@@ -5024,7 +5024,7 @@ const products = {
     "Monitor your body’s response and prioritize health and safety above all."
   ]
 },
-"vidalista-5-en": {
+"vidalista-5": {
   id: "30",
   name: "Vidalista 5 mg",
   brand: "ED Centurion Remedies",
@@ -5212,7 +5212,7 @@ const products = {
   ]
 },
 
-"vidalista-10-en": {
+"vidalista-10mg": {
   id: "31",
   name: "Vidalista 10 mg",
   brand: "ED Centurion Remedies",
@@ -5401,7 +5401,7 @@ const products = {
     "Choose reputable pharmacies or suppliers for safer product sourcing."
   ]
 },
-"vidalista-20mg-en": {
+"vidalista-20mg": {
   id: "32",
   name: "Vidalista 20 mg",
   category: "Vidalista",
@@ -5590,7 +5590,7 @@ const products = {
     "Prioritize overall cardiovascular health to naturally support better functioning."
   ]
 },
-"vidalista-40mg-en": {
+"vidalista-40mg": {
   id: "33",
   name: "Vidalista 40 mg",
   category: "Vidalista",
@@ -5778,7 +5778,7 @@ const products = {
     "Ensure you understand potential interactions with other prescribed treatments before use."
   ]
 },
-"vidalista-60mg-en": {
+"vidalista-60mg": {
   id: "34",
   name: "Vidalista 60 mg",
   brand: "ED Centurion Remedies",
@@ -5966,7 +5966,7 @@ const products = {
     "Use responsibly and only under proper medical supervision."
   ]
 },
-"vidalista-80mg-en": {
+"vidalista-80mg": {
   id: "35",
   name: "Vidalista 80 mg",
   brand: "ED Centurion Remedies",
@@ -6155,7 +6155,7 @@ const products = {
     "Always prioritize your safety and follow professional medical advice for any health-related decisions."
   ]
 },
-"vidalista-black-80mg-en": {
+"vidalista-black-80mg": {
   id: "36",
   name: "Vidalista Black 80",
   brand: "ED Centurion Remedies",
@@ -6344,11 +6344,12 @@ const products = {
     "Prioritize overall cardiovascular health to naturally complement the product’s mechanism."
   ]
 },
-"super-vidalista-20-60-en": {
+"super-vidalista-20-60": {
   id: "37",
   name: "Super Vidalista",
   brand: "ED Centurion Remedies",
   category: "Super Vidalista",
+
   dosage: "Tadalafil 20mg + Dapoxetine 60mg",
   composition: "Tadalafil 20mg, Dapoxetine 60mg",
   form: "Tablet",
@@ -6537,7 +6538,7 @@ const products = {
     "Always prioritize safety and listen to your body’s signals when using any health-related product."
   ]
 },
-"vidalista-ct-20mg-en": {
+"vidalista-ct-20mg": {
   id: "38",
   category: "Tadalafil",
   brand: "ED Centurion Remedies",
@@ -6713,7 +6714,7 @@ const products = {
     "Monitor how your body responds and seek medical help if something feels unusual.",
   ]
 },
-"vidalista-professional-20mg-en": {
+"vidalista-professional-20mg": {
   id: "39",
   category: "Tadalafil",
   brand: "ED Centurion Remedies",
@@ -6903,7 +6904,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Educate yourself on how Tadalafil interacts with the body to make informed decisions."
   ]
 },
-"vilitra-10mg-en": {
+"vilitra-10mg": {
   id: "40",
   name: "Vilitra 10 mg",
   brand: "ED Centurion Remedies",
@@ -7093,7 +7094,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Use responsibly and prioritize long-term wellness over quick solutions."
   ]
 },
-"vilitra-20mg-en": {
+"vilitra-20mg": {
   id: "41",
   name: "Vilitra 20 mg",
   brand: "ED Centurion Remedies",
@@ -7282,7 +7283,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Healthy lifestyle choices significantly support the overall natural effect of the product."
   ]
 },
-"vilitra-40mg-en": {
+"vilitra-40mg": {
   id: "42",
   name: "Vilitra 40 mg",
   brand: "ED Centurion Remedies",
@@ -7471,7 +7472,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Learn about the composition and safety profile before considering usage."
   ]
 },
-"vilitra-60mg-en": {
+"vilitra-60mg": {
   id: "43",
   category: "Vardenafil",
   brand: "ED Centurion Remedies",
@@ -7648,7 +7649,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Never exceed what a healthcare professional determines is appropriate for you."
   ]
 },
-"super-vilitra-en": {
+"super-vilitra": {
   id: "44",
   name: "Super Vilitra",
   brand: "ED Centurion Remedies",
@@ -7841,7 +7842,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "If uncertain about suitability, always consult a qualified medical expert before use."
   ]
 },
-"fliban-100-en": {
+"fliban-100mg": {
   id: "45",
   category: "Flibanserin",
   name: "Fliban",
@@ -8031,7 +8032,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Seek reputable educational resources to understand how brain chemistry and emotional health are connected."
   ]
 },
-"avana-50mg-en": {
+"avana-50mg": {
   id: "46",
   name: "Avana-50",
   brand: "ED Sunrise Remedies",
@@ -8220,7 +8221,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Educate yourself on how Avanafil works to make informed health decisions."
   ]
 },
-"avana-100-en": {
+"avana-100mg": {
   id: "47",
   category: "Avanafil",
   brand: "ED Sunrise Remedies",
@@ -8401,7 +8402,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Maintain healthy lifestyle habits such as hydration, exercise, and sleep to support natural performance."
   ]
 },
-"avana-200-en": {
+"avana-200mg": {
   id: "48",
   category: "Avanafil",
   brand: "ED Sunrise Remedies",
@@ -8592,7 +8593,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Support overall cardiovascular health through regular physical activity and mindful habits."
   ]
 },
-"top-avana-en": {
+"top-avana": {
   id: "49",
   category: "Avanafil + Dapoxetine",
   brand: "ED Sunrise Remedies",
@@ -8787,7 +8788,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Keep the tablets in their original blister pack until needed to prevent exposure to moisture."
   ]
 },
-"super-avana-en": {
+"super-avana": {
   id: "50",
   category: "Avanafil + Dapoxetine",
   brand: "ED Sunrise Remedies",
@@ -8984,7 +8985,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Report any ongoing health concerns to a licensed medical provider for personalized guidance."
   ]
 },
-"extra-super-avana-en": {
+"extra-super-avana  ": {
   id: "51",
   category: "Avanafil + Dapoxetine",
   name: "Extra Super Avana",
@@ -9179,7 +9180,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Follow safety advice provided by healthcare experts to avoid unwanted interactions or risks."
   ]
 },
-"poxet-30-en": {
+"poxet-30mg": {
   id: "52",
   category: "Dapoxetine",
   brand: "ED Sunrise Remedies",
@@ -9371,7 +9372,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Maintain regular follow-ups with a healthcare provider if using similar products long-term."
   ]
 },
-"poxet-60-en": {
+"poxet-60mg": {
   id: "53",
   category: "Dapoxetine",
   brand: "ED Sunrise Remedies",
@@ -9563,7 +9564,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Remember that consistent healthy habits significantly improve control, confidence, and overall well-being."
   ]
 },
-"poxet-90-en": {
+"poxet-90mg": {
   id: "54",
   category: "Dapoxetine",
   brand: "ED Sunrise Remedies",
@@ -9765,12 +9766,12 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Remember that consistent healthy habits significantly improve control, confidence, and overall well-being."
   ]
 },
-"p-force-100-caps-en": {
+"p-force-100-caps": {
   id: "55",
   name: "P-Force 100 Caps.",
   brand: "ED Sunrise Remedies",
   category: "P-Force Range",
-  dosage: "100",
+  dosage: "100",  
   composition: "Sildenafil Citrate 100",
   form: "Capsule",
   pack_size: "One Box Contains 10 X 10 Capsules",
@@ -9965,7 +9966,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Consistent, responsible use supports confidence, satisfaction, and overall sexual well-being."
   ]
 },
-"p-force-fort-en": {
+"p-force-fort": {
   id: "56",
   name: "P-Force Fort",
   brand: "ED Sunrise Remedies",
@@ -10165,7 +10166,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Regular medical checkups help monitor safe usage and adjust dosage if necessary."
   ]
 },
-"p-force-plus-en": {
+"p-force-plus": {
   id: "57",
   name: "P-Force Plus",
   brand: "ED Sunrise Remedies",
@@ -10364,7 +10365,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Regular check-ups help ensure safe and effective long-term use of the medication."
   ]
 },
-"super-p-force-oral-jelly-en": {
+"super-p-force": {
   id: "58",
   name: "Super P-Force Oral Jelly",
   brand: "ED Sunrise Remedies",
@@ -10762,7 +10763,7 @@ metaTitle:"Vidalista Professional 20mg ED Pharma Exporter Europe | Wholesale Sup
     "Regular health check-ups ensure safe and effective use of combination therapy."
   ]
 },
-"extra-super-p-force-en": {
+"extra-super-p-force": {
   id: "60",
   name: "Extra Super P-Force",
   brand: "ED Sunrise Remedies",
@@ -11755,7 +11756,7 @@ administration: [
     "Store away from children and individuals for whom the product is not intended."
   ]
   },
-  "zhewitra-60-en":{
+  "zhewitra-60":{
     id: "65",
     name: "Zhewitra 60",
     brand: "ED Sunrise Remedies",
@@ -11954,7 +11955,7 @@ administration: [
     "Regular medical check-ups help ensure safe and effective use of Zhewitra 40."
   ]
   },
-  "zhewitra-soft-20-en":{
+  "zhewitra-soft-20":{
     id: "66",
     name: "Zhewitra Soft-20",
     brand: "ED Sunrise Remedies",
@@ -12151,7 +12152,7 @@ administration: [
     "Regular check-ups help ensure safe and effective long-term use."
   ]
   },
-"Super-Zhewitra-en":{
+"super-zhewitra":{
     id: "67",
     name: "Super Zhewitra",
     brand: "ED Sunrise Remedies",
@@ -12350,7 +12351,7 @@ administration: [
     "Regular health check-ups help ensure safe and effective long-term use of combination therapy."
   ]
   },
-  "Extra-Super-Zhewitra-en":{
+  "extra-super-zhewitra":{
     id: "68",
     name: "Extra Super Zhewitra",
     brand: "ED Sunrise Remedies",
@@ -12548,7 +12549,7 @@ administration: [
   ]
   },
   
-  "Tadarise-2.5-en":{
+  "tadarise-2-5":{
     id: "69",
     name: "Tadarise-2.5",
     brand: "ED Sunrise Remedies",
@@ -12747,7 +12748,7 @@ administration: [
     "Combine use with positive communication with your partner for best sexual satisfaction."
   ]
   },
-  "Tadarise-5-en":{
+  "tadarise-5":{
     id: "70",
     name: "Tadarise-5",
     brand: "ED Sunrise Remedies",
@@ -12944,7 +12945,7 @@ administration: [
     "Educate yourself on PDE5 inhibitors to make informed decisions about your sexual health."
   ]
   },
-  "Tadarise-10-en":{
+  "tadarise-10":{
     id: "71",
     name: "Tadarise-10",
     brand: "ED Sunrise Remedies",
@@ -13144,7 +13145,7 @@ administration: [
     "Maintain the medication out of reach of children and pets."
   ]
   },
-  "Tadarise-Pro-20-en":{
+  "tadarise-pro-20":{
     id: "72",
     name: "Tadarise Pro-20",
     brand: "ED Sunrise Remedies",
@@ -13341,7 +13342,7 @@ administration: [
     "Regular check-ups help ensure safe, long-term use and optimal sexual health."
   ]
   },
-  "Tadarise-20-en":{ 
+  "tadarise-20":{ 
     id: "73",
     name: "Tadarise-20",
     brand: "ED Sunrise Remedies",
@@ -13540,7 +13541,7 @@ administration: [
     "Regular check-ups help ensure safe and effective use of Tadarise-20."
   ]
   },
-  "Tadarise-20-Oral-Jelly-en":{
+  "tadarise-20-oral-jelly":{
     id: "74",
     name: "Tadarise-20 Oral Jelly",
     brand: "ED Sunrise Remedies",
@@ -13739,7 +13740,7 @@ administration: [
     "Regular medical check-ups help ensure safe and effective long-term use."
   ]
   },
-  "Tadarise-40-en":{
+  "tadarise-40":{
     id: "75",
     name: "Tadarise-40",
     brand: "ED Sunrise Remedies",
@@ -13935,7 +13936,7 @@ administration: [
     "Regular medical check-ups help ensure safe and effective use of Tadalafil."
   ]
   },
-  "Tadarise Pro-40-en":{
+  "tadarise-pro-40":{
     id: "76",
     name: "Tadarise Pro-40",
     brand: "ED Sunrise Remedies",
@@ -14529,7 +14530,7 @@ administration: [
     "Regular check-ups help ensure safe and effective use of the combination therapy."
   ]
   },
-  "Extra-Super-Tadarise-en":{
+  "extra-super-tadarise":{
     id: "79",
     name: "Extra Super Tadarise",
     brand: "ED Sunrise Remedies",
@@ -14727,7 +14728,7 @@ administration: [
     "Regular check-ups help maintain safe and effective use of combination therapy."
   ]
   },
-  "Tadarise-Effervescent-en":{
+  "tadarise-effervescent":{
     id: "80",
     name: "Tadarise Effervescent",
     brand: "ED Sunrise Remedies",
@@ -14923,7 +14924,7 @@ administration: [
     "Regular check-ups ensure safe and effective use of Tadalafil effervescent tablets."
   ]
   },
-"top-tadarise-en": {
+"top-tadarise": {
   id: "81",
   name: "Top Tadarise",
   brand: "ED Sunrise Remedies",
@@ -15110,7 +15111,7 @@ administration: [
     "Choose reputable suppliers for safety."
   ]
 },
-"tadasoft-20-en": {
+"tadasoft-20": {
   id: "82",
   name: "Tadasoft 20 mg",
   brand: "ED Sunrise Remedies",
@@ -15297,7 +15298,7 @@ administration: [
     "Choose reputable suppliers for safety."
   ]
 },
-"tadasoft-40-en": {
+"tadasoft-40": {
   id: "83",
   name: "Tadasoft 40 mg",
   brand: "ED Sunrise Remedies",
@@ -15485,7 +15486,7 @@ administration: [
     "Choose reputable suppliers for safety."
   ]
 },
-"Sildisoft-100-en":{
+"sildisoft-100":{
     id: "84",
     name: "Sildisoft-100",
     brand: "ED Sunrise Remedies",
@@ -15682,7 +15683,7 @@ administration: [
     "Regular check-ups ensure safe and effective use of Sildenafil for ED."
   ]
   },
-  "Sildisoft-50-en":{
+  "sildisoft-50":{
   id: "85",
   name: "Sildisoft-50",
   brand: "ED Sunrise Remedies",
@@ -15883,7 +15884,7 @@ administration: [
 },
 
   
-  "Malegra-25-en":{
+  "malegra-25":{
     id: "86",
     name: "Malegra 25",
     brand: "ED Sunrise Remedies",
@@ -16276,7 +16277,7 @@ administration: [
     "Regular check-ups ensure safe and effective use of Sildenafil for ED."
   ]
   },
-  "Malegra-75-en":{
+  "malegra-75":{
     id: "88",
     name: "Malegra 75",
     brand: "ED Sunrise Remedies",
@@ -16866,7 +16867,7 @@ administration: [
     "Regular medical check-ups ensure safe and effective use of Malegra 120."
   ]
   },
-  "Malegra-200-en":{
+  "malegra-200":{
     id: "91",
     name: "Malegra 200",
     brand: "ED Sunrise Remedies",
@@ -17065,7 +17066,7 @@ administration: [
     "Regular check-ups help ensure safe and effective use of Malegra 200."
   ]
   },
-  "malegra-100-oral-jelly-en":{
+  "malegra-100-oral-jelly":{
     id: "92",
     name: "Malegra 100 Oral Jelly",
     brand: "ED Sunrise Remedies",
@@ -17264,7 +17265,7 @@ administration: [
     "Regular medical check-ups help ensure safe and effective use of Sildenafil."
   ]
   },
-  "Malegra-Pro-50-en":{
+  "malegra-pro-50":{
     id: "93",
     name: "Malegra Pro 50",
     brand: "ED Sunrise Remedies",
@@ -17461,7 +17462,7 @@ administration: [
     "Regular check-ups ensure safe and effective use of Sildenafil for ED."
   ]
   },
-  "Malegra-Pro-100-en":{
+  "malegra-pro-100":{
     id: "94",
     name: "Malegra Pro 100",
     brand: "ED Sunrise Remedies",
@@ -17658,7 +17659,7 @@ administration: [
     "Regular medical check-ups help ensure safe and effective long-term use."
   ]
   },
-  "Malegra-dxt-en":{
+  "malegra-dxt-plus":{
     id: "95",
     name: "Malegra DXT",
     brand: "ED Sunrise Remedies",
@@ -18054,7 +18055,7 @@ administration: [
   ]
   
   },
-  "Malegra-FXT-en":{
+  "malegra-fxt":{
     id: "97",
     name: "Malegra FXT",
     brand: "ED Sunrise Remedies",
@@ -18251,7 +18252,7 @@ administration: [
     "Regular check-ups help ensure safe and effective use of the combination therapy."
   ]
   },
-  "Malegra-FXT-Plus":{
+  "malegra-fxt-plus":{
     id: "98",
     name: "Malegra FXT Plus",
     brand: "ED Sunrise Remedies",
@@ -18449,7 +18450,7 @@ administration: [
     "Regular medical check-ups help ensure safe and effective long-term use."
   ]
   },
-  "Malegra-Effervescent100mg-en":{
+  "malegra-effervescent-100":{
     id: "99",
     name: "Malegra Effervescent 100mg",
     category: "Malegra Range",
@@ -18648,7 +18649,7 @@ administration: [
     "Regular check-ups ensure safe and effective use of Sildenafil."
   ]
   },
-  "Malegra100-Green-en":{
+  "malegra-100-green":{
     id: "100",
     name: "Malegra 100 Green",
     brand: "ED Sunrise Remedies",
@@ -19044,7 +19045,7 @@ warnings: [
     "Use only products from reliable and trusted pharmaceutical suppliers."
   ]
   },
-  "Penon-Cream-en":{
+  "penon-cream":{
   id: "102",
   name: "Penon Cream",
   brand: "ED Sunrise Remedies",
@@ -19360,7 +19361,7 @@ administration: [
     "Maintain a balanced skincare routine with hydration and gentle cleansing for best overall results."
   ]
   },
-  "Grafix-Cream-en":{
+  "grafix-cream":{
     id: "104",
     name: "Grafix Cream",
     brand: "ED Sunrise Remedies",
@@ -19512,7 +19513,7 @@ administration: [
     "Remember that results vary, and the purpose of the cream is to support skin wellness, comfort, and confidence."
   ]
   },
-  "Femallegra-100-en":{
+  "femallegra-100":{
     id: "105",
     name: "Femallegra-100",
     brand: "ED Sunrise Remedies",
@@ -19660,7 +19661,7 @@ administration: [
     "Focus on holistic well-being — physical, mental, and emotional — for the best long-term benefits."
   ]
   },
-  "Tadafem-20-en":{
+  "tadafem-20":{
     id: "106",
     name: "Tadafem-20",
     brand: "ED Sunrise Remedies",
@@ -19815,7 +19816,7 @@ administration: [
     "Regular check-ups help ensure safe, suitable, and effective use over time."
   ]
   },
-  "clofi-25-en":{
+  "clofi-25":{
     id: "107",
     name: "Clofi-25",
     brand: "ED Sunrise Remedies",
@@ -19956,7 +19957,7 @@ administration: [
     "Education about reproductive health helps individuals make safe, informed decisions throughout adulthood."
   ]
   },
-  "Clofi-50-en":{
+  "naron-cream":{
     id: "108",
     name: "Clofi-50",
     brand: "ED Sunrise Remedies",
@@ -20098,7 +20099,7 @@ administration: [
     "Remember that consistent lifestyle habits improve reproductive health and overall well-being."
   ]
   },
-  "Clofi-100-en":{
+  "clofi-100":{
   id: "109",
   name: "Clofi-100",
   brand: "ED Sunrise Remedies",
@@ -20975,7 +20976,7 @@ administration: [
     "Maintain general hygiene and preventive practices to reduce the risk of future parasitic infections."
   ]
   },
-   "Cinasun-30-en":{
+   "cinasun-30":{
     id: "115",
     name: "Cinasun-30",
     brand: "ED Sunrise Remedies",
@@ -21115,7 +21116,7 @@ administration: [
     "Regular follow-ups help ensure that calcium levels remain within a safe and healthy range."
   ]
   },
-  "Cinasun-60-en":{
+  "cinasun-60":{
     id: "116",
     name: "Cinasun-60",
     brand: "ED Sunrise Remedies",
@@ -21397,7 +21398,7 @@ administration: [
   ]
   },
   
-  "Chocolis-20-en":{
+  "chocolis-20":{
     id: "118",
     name: "Chocolis-20",
     category: "Other Range",
@@ -21553,7 +21554,7 @@ administration: [
     "Consistency in healthy routines improves comfort, confidence, and overall performance."
   ]
   },
-  "Chocogra-100-en":{
+  "chocogra-100":{
     id: "119",
     name: "Chocogra-100",
     brand: "ED Sunrise Remedies",
@@ -21706,7 +21707,7 @@ administration: [
     "Schedule regular health check-ups to ensure safe long-term use."
   ]
   },
-  "Orlisun-en":{
+  "orlisun-120":{
     id: "120",
     name: "Orlisun",
     brand: "ED Sunrise Remedies",
@@ -21846,7 +21847,7 @@ administration: [
   ]
   
   },
-   "Modafresh-200-en":{
+   "mdafresh-200":{ 
     id: "121",
     name: "Modafresh-200",
     brand: "ED Sunrise Remedies",
@@ -21985,7 +21986,7 @@ administration: [
     "Regular medical checkups help ensure that wakefulness-related treatments remain safe and appropriate."
   ]
   },
-  "Sunpecia-1mg/5mg-en":{
+  "Sunpecia-1mg/5mg":{
     id: "122",
     name: "Sunpecia 1mg / 5mg",
     brand: "ED Sunrise Remedies",
@@ -22165,7 +22166,7 @@ administration: [
     "Use Sunpecia responsibly and only when guided by a qualified medical professional."
   ]
   },
-  "Pirfisun-Tablet-en":{
+  "Pirfisun-Tablet":{
     id: "123",
     name: "Pirfisun Tablet",
     brand: "ED Sunrise Remedies",

@@ -5,7 +5,6 @@ import { useCart } from '../context/CartContext';
 import Link from 'next/link';
 import { Trash2, ShoppingBag } from 'lucide-react';
 
-
 export default function CartPage() {
   const { cartItems, cartTotal, cartCount, removeFromCart, updateQuantity, clearCart } = useCart();
   
@@ -28,7 +27,7 @@ export default function CartPage() {
       </div>
     );
   }
-  console.log(cartItems)
+  
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -66,28 +65,36 @@ export default function CartPage() {
                         </div>
                         <button
                           onClick={() => removeFromCart(item.id)}
-                          className="text-[#677E8A] hover:text-red-500 h-fit"
+                          className="text-[#677E8A] hover:text-red-500 h-fit transition-colors duration-200"
                         >
                           <Trash2 size={20} />
                         </button>
                       </div>
                       
                       <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center">
+                        {/* Updated Quantity Buttons with Gradient */}
+                        <div className="flex items-center rounded-xl overflow-hidden shadow-sm">
                           <button
                             onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                            className="w-8 h-8 rounded-l border border-[#ABAFB5] flex items-center justify-center"
+                            disabled={item.quantity <= 1}
+                            className={`w-10 h-10 flex items-center justify-center transition-all duration-300 ${
+                              item.quantity <= 1
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-[#677E8A] to-[#122E34] text-white hover:from-[#5a6f7a] hover:to-[#0e1d21] active:scale-95'
+                            }`}
                           >
-                            -
+                            <span className="font-bold text-lg">-</span>
                           </button>
-                          <div className="w-12 h-8 border-y border-[#ABAFB5] flex items-center justify-center">
-                            {item.quantity}
+                          
+                          <div className="w-12 h-10 bg-white border-y border-[#ABAFB5]/30 flex items-center justify-center">
+                            <span className="font-semibold text-[#0E1D21]">{item.quantity}</span>
                           </div>
+                          
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="w-8 h-8 rounded-r border border-[#ABAFB5] flex items-center justify-center"
+                            className="w-10 h-10 flex items-center justify-center bg-gradient-to-r from-[#677E8A] to-[#122E34] text-white hover:from-[#5a6f7a] hover:to-[#0e1d21] active:scale-95 transition-all duration-300"
                           >
-                            +
+                            <span className="font-bold text-lg">+</span>
                           </button>
                         </div>
                         
@@ -104,7 +111,7 @@ export default function CartPage() {
               <div className="flex justify-end">
                 <button
                   onClick={clearCart}
-                  className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg font-medium"
+                  className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors duration-200"
                 >
                   Clear Cart
                 </button>

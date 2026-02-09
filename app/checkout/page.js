@@ -32,6 +32,7 @@ export default function CheckoutPage() {
   const [showCardDetails, setShowCardDetails] = useState(false);
   const [showAllInfo, setShowAllInfo] = useState(true);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -51,12 +52,12 @@ export default function CheckoutPage() {
 
   // Color palette
   const colors = {
-    primary: "#2596be",      // Blue
-    secondary: "#ABAFB5",    // Light Gray
-    accent: "#677E8A",       // Gray Blue
-    dark: "#622347",         // Purple Maroon
-    darkBlue: "#122E34",     // Dark Blue
-    darkest: "#0E1D21",      // Almost Black
+    primary: "#2596be",
+    secondary: "#ABAFB5",
+    accent: "#677E8A",
+    dark: "#622347",
+    darkBlue: "#122E34",
+    darkest: "#0E1D21",
   };
 
   useEffect(() => {
@@ -65,9 +66,220 @@ export default function CheckoutPage() {
     }
   }, [cartItems, router, orderPlaced]);
 
+  // Validation functions
+  const validateName = (name) => {
+    // Only allows letters, spaces, hyphens, and apostrophes
+    return /^[A-Za-z\s'-]+$/.test(name);
+  };
+
+  const validatePhone = (phone) => {
+    // Remove non-digits for validation
+    const digitsOnly = phone.replace(/\D/g, "");
+    return digitsOnly.length === 10;
+  };
+
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const validateCardNumber = (cardNumber) => {
+    const digitsOnly = cardNumber.replace(/\D/g, "");
+    return digitsOnly.length === 16;
+  };
+
+  const validateExpiryDate = (expiryDate) => {
+    // Format: MM/YY
+    return /^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryDate);
+  };
+
+  const validateCVV = (cvv) => {
+    const digitsOnly = cvv.replace(/\D/g, "");
+    return digitsOnly.length === 3 || digitsOnly.length === 4;
+  };
+
+  const validateZipCode = (zipCode) => {
+    return /^\d{5}(-\d{4})?$/.test(zipCode);
+  };
+
+  const validateStep = (stepNumber) => {
+    const newErrors = {};
+
+    if (stepNumber === 1) {
+      if (!formData.firstName.trim()) {
+        newErrors.firstName = "First name is required";
+      } else if (!validateName(formData.firstName)) {
+        newErrors.firstName = "Name can only contain letters, spaces, hyphens, and apostrophes";
+      }
+
+      if (!formData.lastName.trim()) {
+        newErrors.lastName = "Last name is required";
+      } else if (!validateName(formData.lastName)) {
+        newErrors.lastName = "Name can only contain letters, spaces, hyphens, and apostrophes";
+      }
+
+      if (!formData.email.trim()) {
+        newErrors.email = "Email is required";
+      } else if (!validateEmail(formData.email)) {
+        newErrors.email = "Please enter a valid email address";
+      }
+
+      if (!formData.phone.trim()) {
+        newErrors.phone = "Phone number is required";
+      } else if (!validatePhone(formData.phone)) {
+        newErrors.phone = "Please enter a valid 10-digit phone number";
+      }
+    }
+
+    if (stepNumber === 2) {
+      if (!formData.address.trim()) {
+        newErrors.address = "Address is required";
+      }
+
+      if (!formData.city.trim()) {
+        newErrors.city = "City is required";
+      } else if (!validateName(formData.city)) {
+        newErrors.city = "City can only contain letters, spaces, hyphens, and apostrophes";
+      }
+
+      if (!formData.state.trim()) {
+        newErrors.state = "State is required";
+      } else if (!validateName(formData.state)) {
+        newErrors.state = "State can only contain letters, spaces, hyphens, and apostrophes";
+      }
+
+      if (!formData.zipCode.trim()) {
+        newErrors.zipCode = "ZIP code is required";
+      } else if (!validateZipCode(formData.zipCode)) {
+        newErrors.zipCode = "Please enter a valid 5-digit ZIP code";
+      }
+    }
+
+    if (stepNumber === 3) {
+      if (!formData.cardNumber.trim()) {
+        newErrors.cardNumber = "Card number is required";
+      } else if (!validateCardNumber(formData.cardNumber)) {
+        newErrors.cardNumber = "Please enter a valid 16-digit card number";
+      }
+
+      if (!formData.cardName.trim()) {
+        newErrors.cardName = "Cardholder name is required";
+      } else if (!validateName(formData.cardName)) {
+        newErrors.cardName = "Name can only contain letters, spaces, hyphens, and apostrophes";
+      }
+
+      if (!formData.expiryDate.trim()) {
+        newErrors.expiryDate = "Expiry date is required";
+      } else if (!validateExpiryDate(formData.expiryDate)) {
+        newErrors.expiryDate = "Please enter a valid expiry date (MM/YY)";
+      }
+
+      if (!formData.cvv.trim()) {
+        newErrors.cvv = "CVV is required";
+      } else if (!validateCVV(formData.cvv)) {
+        newErrors.cvv = "Please enter a valid 3 or 4-digit CVV";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Format phone number as user types
+    if (name === "phone") {
+      // Remove all non-digits
+      const digitsOnly = value.replace(/\D/g, "");
+      
+      // Format as (XXX) XXX-XXXX
+      let formatted = digitsOnly;
+      if (digitsOnly.length > 0) {
+        formatted = "(" + digitsOnly.substring(0, 3);
+      }
+      if (digitsOnly.length >= 4) {
+        formatted = "(" + digitsOnly.substring(0, 3) + ") " + digitsOnly.substring(3, 6);
+      }
+      if (digitsOnly.length >= 7) {
+        formatted = "(" + digitsOnly.substring(0, 3) + ") " + digitsOnly.substring(3, 6) + "-" + digitsOnly.substring(6, 10);
+      }
+      
+      setFormData((prev) => ({ ...prev, [name]: formatted }));
+    }
+    // Restrict name fields to letters only
+    else if (name === "firstName" || name === "lastName" || name === "city" || name === "state" || name === "cardName") {
+      // Allow letters, spaces, hyphens, and apostrophes
+      if (value === "" || /^[A-Za-z\s'-]*$/.test(value)) {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+      }
+    }
+    // Format card number as user types
+    else if (name === "cardNumber") {
+      // Remove all non-digits
+      const digitsOnly = value.replace(/\D/g, "");
+      
+      // Format as XXXX XXXX XXXX XXXX
+      let formatted = digitsOnly;
+      if (digitsOnly.length > 0) {
+        formatted = digitsOnly.match(/.{1,4}/g)?.join(" ") || digitsOnly;
+      }
+      
+      // Limit to 16 digits
+      if (digitsOnly.length <= 16) {
+        setFormData((prev) => ({ ...prev, [name]: formatted }));
+      }
+    }
+    // Format expiry date as user types
+    else if (name === "expiryDate") {
+      // Remove all non-digits
+      const digitsOnly = value.replace(/\D/g, "");
+      
+      // Format as MM/YY
+      let formatted = digitsOnly;
+      if (digitsOnly.length >= 2) {
+        formatted = digitsOnly.substring(0, 2) + "/" + digitsOnly.substring(2, 4);
+      }
+      
+      // Limit to 4 digits (MM/YY)
+      if (digitsOnly.length <= 4) {
+        setFormData((prev) => ({ ...prev, [name]: formatted }));
+      }
+    }
+    // Format CVV as user types (numbers only)
+    else if (name === "cvv") {
+      // Remove all non-digits
+      const digitsOnly = value.replace(/\D/g, "");
+      
+      // Limit to 4 digits
+      if (digitsOnly.length <= 4) {
+        setFormData((prev) => ({ ...prev, [name]: digitsOnly }));
+      }
+    }
+    // Format ZIP code as user types
+    else if (name === "zipCode") {
+      // Remove all non-digits
+      const digitsOnly = value.replace(/\D/g, "");
+      
+      // Format as 5 digits or 5+4
+      let formatted = digitsOnly;
+      if (digitsOnly.length > 5) {
+        formatted = digitsOnly.substring(0, 5) + "-" + digitsOnly.substring(5, 9);
+      }
+      
+      // Limit to 9 digits (for ZIP+4)
+      if (digitsOnly.length <= 9) {
+        setFormData((prev) => ({ ...prev, [name]: formatted }));
+      }
+    }
+    // For all other fields
+    else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+    
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: "" }));
+    }
   };
 
   const subtotal = cartTotal;
@@ -76,16 +288,47 @@ export default function CheckoutPage() {
   const total = subtotal + tax + shipping;
 
   const placeOrder = () => {
-    const orderId = `ORD-${Date.now().toString().slice(-8)}`;
-    setOrderNumber(orderId);
-    clearCart();
-    setOrderPlaced(true);
-    setFormSubmitted(true);
+    // Validate all steps before placing order
+    let isValid = true;
+    const allErrors = {};
+    
+    // Validate step 1
+    if (!validateStep(1)) {
+      isValid = false;
+      setStep(1);
+      return;
+    }
+    
+    // Validate step 2
+    if (!validateStep(2)) {
+      isValid = false;
+      setStep(2);
+      return;
+    }
+    
+    // Validate step 3
+    if (!validateStep(3)) {
+      isValid = false;
+      setStep(3);
+      return;
+    }
+    
+    if (isValid) {
+      const orderId = `ORD-${Date.now().toString().slice(-8)}`;
+      setOrderNumber(orderId);
+      clearCart();
+      setOrderPlaced(true);
+      setFormSubmitted(true);
+    }
   };
 
   const handleStepContinue = () => {
-    if (step < 4) {
-      setStep(step + 1);
+    if (step === 1 && validateStep(1)) {
+      setStep(2);
+    } else if (step === 2 && validateStep(2)) {
+      setStep(3);
+    } else if (step === 3 && validateStep(3)) {
+      setStep(4);
     }
   };
 
@@ -99,7 +342,8 @@ export default function CheckoutPage() {
 
   const maskCardNumber = (cardNumber) => {
     if (!cardNumber) return "•••• •••• •••• ••••";
-    return cardNumber.replace(/\d(?=\d{4})/g, "•");
+    const digitsOnly = cardNumber.replace(/\D/g, "");
+    return "•••• •••• •••• " + digitsOnly.slice(-4);
   };
 
   const maskCVV = (cvv) => {
@@ -107,10 +351,10 @@ export default function CheckoutPage() {
     return "•".repeat(cvv.length);
   };
 
-  // Format phone number
+  // Format phone number for display
   const formatPhone = (phone) => {
     if (!phone) return "";
-    return phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
+    return phone;
   };
 
   if (orderPlaced) {
@@ -301,8 +545,16 @@ export default function CheckoutPage() {
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleChange}
-                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all"
+                      className={`w-full p-4 rounded-xl bg-white border ${
+                        errors.firstName ? "border-red-500" : "border-gray-300"
+                      } text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all`}
                     />
+                    {errors.firstName && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                        <span className="text-red-500">•</span>
+                        {errors.firstName}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-gray-700 mb-2 font-medium">Last Name *</label>
@@ -311,8 +563,16 @@ export default function CheckoutPage() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleChange}
-                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all"
+                      className={`w-full p-4 rounded-xl bg-white border ${
+                        errors.lastName ? "border-red-500" : "border-gray-300"
+                      } text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all`}
                     />
+                    {errors.lastName && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                        <span className="text-red-500">•</span>
+                        {errors.lastName}
+                      </p>
+                    )}
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-gray-700 mb-2 font-medium">Email Address *</label>
@@ -324,9 +584,17 @@ export default function CheckoutPage() {
                         type="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full p-4 pl-12 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all"
+                        className={`w-full p-4 pl-12 rounded-xl bg-white border ${
+                          errors.email ? "border-red-500" : "border-gray-300"
+                        } text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all`}
                       />
                     </div>
+                    {errors.email && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                        <span className="text-red-500">•</span>
+                        {errors.email}
+                      </p>
+                    )}
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-gray-700 mb-2 font-medium">Phone Number *</label>
@@ -337,9 +605,19 @@ export default function CheckoutPage() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full p-4 pl-12 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all"
+                        className={`w-full p-4 pl-12 rounded-xl bg-white border ${
+                          errors.phone ? "border-red-500" : "border-gray-300"
+                        } text-gray-900 placeholder-gray-500 focus:border-[#2596be] focus:ring-2 focus:ring-[#2596be]/20 outline-none transition-all`}
                       />
                     </div>
+                    {errors.phone ? (
+                      <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                        <span className="text-red-500">•</span>
+                        {errors.phone}
+                      </p>
+                    ) : (
+                      <p className="text-gray-500 text-sm mt-1">Enter 10-digit phone number</p>
+                    )}
                   </div>
                 </div>
 
@@ -373,7 +651,12 @@ export default function CheckoutPage() {
 
                 <button
                   onClick={handleStepContinue}
-                  className="mt-8 w-full bg-gradient-to-r from-[#2596be] to-[#122E34] text-white py-4 rounded-xl font-semibold hover:from-[#2596be] hover:to-[#0E1D21] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
+                  disabled={Object.keys(errors).some(key => errors[key])}
+                  className={`mt-8 w-full ${
+                    Object.keys(errors).some(key => errors[key])
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-gradient-to-r from-[#2596be] to-[#122E34] hover:from-[#2596be] hover:to-[#0E1D21] transform hover:-translate-y-0.5"
+                  } text-white py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg flex items-center justify-center gap-3`}
                 >
                   Continue to Shipping
                   <ChevronRight size={20} />
@@ -412,9 +695,17 @@ export default function CheckoutPage() {
                         name="address"
                         value={formData.address}
                         onChange={handleChange}
-                        className="w-full p-4 pl-12 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all"
+                        className={`w-full p-4 pl-12 rounded-xl bg-white border ${
+                          errors.address ? "border-red-500" : "border-gray-300"
+                        } text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all`}
                       />
                     </div>
+                    {errors.address && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                        <span className="text-red-500">•</span>
+                        {errors.address}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-gray-700 mb-2 font-medium">City *</label>
@@ -423,8 +714,16 @@ export default function CheckoutPage() {
                       name="city"
                       value={formData.city}
                       onChange={handleChange}
-                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all"
+                      className={`w-full p-4 rounded-xl bg-white border ${
+                        errors.city ? "border-red-500" : "border-gray-300"
+                      } text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all`}
                     />
+                    {errors.city && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                        <span className="text-red-500">•</span>
+                        {errors.city}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-gray-700 mb-2 font-medium">State *</label>
@@ -433,8 +732,16 @@ export default function CheckoutPage() {
                       name="state"
                       value={formData.state}
                       onChange={handleChange}
-                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all"
+                      className={`w-full p-4 rounded-xl bg-white border ${
+                        errors.state ? "border-red-500" : "border-gray-300"
+                      } text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all`}
                     />
+                    {errors.state && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                        <span className="text-red-500">•</span>
+                        {errors.state}
+                      </p>
+                    )}
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-gray-700 mb-2 font-medium">ZIP Code *</label>
@@ -443,8 +750,18 @@ export default function CheckoutPage() {
                       name="zipCode"
                       value={formData.zipCode}
                       onChange={handleChange}
-                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all"
+                      className={`w-full p-4 rounded-xl bg-white border ${
+                        errors.zipCode ? "border-red-500" : "border-gray-300"
+                      } text-gray-900 placeholder-gray-500 focus:border-[#622347] focus:ring-2 focus:ring-[#622347]/20 outline-none transition-all`}
                     />
+                    {errors.zipCode ? (
+                      <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                        <span className="text-red-500">•</span>
+                        {errors.zipCode}
+                      </p>
+                    ) : (
+                      <p className="text-gray-500 text-sm mt-1">Enter 5-digit ZIP code</p>
+                    )}
                   </div>
                 </div>
 
@@ -489,7 +806,12 @@ export default function CheckoutPage() {
 
                 <button
                   onClick={handleStepContinue}
-                  className="mt-8 w-full bg-gradient-to-r from-[#622347] to-[#122E34] text-white py-4 rounded-xl font-semibold hover:from-[#622347] hover:to-[#0E1D21] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
+                  disabled={Object.keys(errors).some(key => errors[key])}
+                  className={`mt-8 w-full ${
+                    Object.keys(errors).some(key => errors[key])
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-gradient-to-r from-[#622347] to-[#122E34] hover:from-[#622347] hover:to-[#0E1D21] transform hover:-translate-y-0.5"
+                  } text-white py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg flex items-center justify-center gap-3`}
                 >
                   Continue to Payment
                   <ChevronRight size={20} />
@@ -529,7 +851,9 @@ export default function CheckoutPage() {
                         value={showCardDetails ? formData.cardNumber : maskCardNumber(formData.cardNumber)}
                         onChange={handleChange}
                         type={showCardDetails ? "text" : "password"}
-                        className="w-full p-4 pl-12 pr-12 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all"
+                        className={`w-full p-4 pl-12 pr-12 rounded-xl bg-white border ${
+                          errors.cardNumber ? "border-red-500" : "border-gray-300"
+                        } text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all`}
                       />
                       <button
                         type="button"
@@ -539,6 +863,14 @@ export default function CheckoutPage() {
                         {showCardDetails ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
+                    {errors.cardNumber ? (
+                      <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                        <span className="text-red-500">•</span>
+                        {errors.cardNumber}
+                      </p>
+                    ) : (
+                      <p className="text-gray-500 text-sm mt-1">Enter 16-digit card number</p>
+                    )}
                   </div>
 
                   <div>
@@ -548,8 +880,16 @@ export default function CheckoutPage() {
                       name="cardName"
                       value={formData.cardName}
                       onChange={handleChange}
-                      className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all"
+                      className={`w-full p-4 rounded-xl bg-white border ${
+                        errors.cardName ? "border-red-500" : "border-gray-300"
+                      } text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all`}
                     />
+                    {errors.cardName && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                        <span className="text-red-500">•</span>
+                        {errors.cardName}
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -560,8 +900,16 @@ export default function CheckoutPage() {
                         name="expiryDate"
                         value={formData.expiryDate}
                         onChange={handleChange}
-                        className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all"
+                        className={`w-full p-4 rounded-xl bg-white border ${
+                          errors.expiryDate ? "border-red-500" : "border-gray-300"
+                        } text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all`}
                       />
+                      {errors.expiryDate && (
+                        <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                          <span className="text-red-500">•</span>
+                          {errors.expiryDate}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-gray-700 mb-2 font-medium">CVV *</label>
@@ -572,9 +920,19 @@ export default function CheckoutPage() {
                           value={showCardDetails ? formData.cvv : maskCVV(formData.cvv)}
                           onChange={handleChange}
                           type={showCardDetails ? "text" : "password"}
-                          className="w-full p-4 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all"
+                          className={`w-full p-4 rounded-xl bg-white border ${
+                            errors.cvv ? "border-red-500" : "border-gray-300"
+                          } text-gray-900 placeholder-gray-500 focus:border-[#677E8A] focus:ring-2 focus:ring-[#677E8A]/20 outline-none transition-all`}
                         />
                       </div>
+                      {errors.cvv ? (
+                        <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                          <span className="text-red-500">•</span>
+                          {errors.cvv}
+                        </p>
+                      ) : (
+                        <p className="text-gray-500 text-sm mt-1">3 or 4-digit security code</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -624,7 +982,12 @@ export default function CheckoutPage() {
 
                 <button
                   onClick={handleStepContinue}
-                  className="mt-8 w-full bg-gradient-to-r from-[#677E8A] to-[#122E34] text-white py-4 rounded-xl font-semibold hover:from-[#677E8A] hover:to-[#0E1D21] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
+                  disabled={Object.keys(errors).some(key => errors[key])}
+                  className={`mt-8 w-full ${
+                    Object.keys(errors).some(key => errors[key])
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-gradient-to-r from-[#677E8A] to-[#122E34] hover:from-[#677E8A] hover:to-[#0E1D21] transform hover:-translate-y-0.5"
+                  } text-white py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg flex items-center justify-center gap-3`}
                 >
                   Review Order
                   <ChevronRight size={20} />

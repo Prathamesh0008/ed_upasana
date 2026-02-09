@@ -4,6 +4,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useCart } from '../../context/CartContext';
+import products from '../../data/en';
 //import { useCart } from '@/app/context/CartContext';
 //import products from '@/data/products';
 //import products from '../../../data/products';

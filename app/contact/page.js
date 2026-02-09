@@ -4,10 +4,10 @@ import { useId, useState } from 'react';
 import Link from 'next/link';
 import {
   Mail, User, Phone, MessageSquare, ClipboardList, CheckCircle2,
-  MapPin, Clock, ArrowRight, ChevronDown
+  MapPin, Clock, ArrowRight, ChevronDown, AlertCircle
 } from 'lucide-react';
 
-function Field({ label, id, icon: Icon, children, hint }) {
+function Field({ label, id, icon: Icon, children, hint, error }) {
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="block text-sm font-medium text-[#0E1D21]">
@@ -22,7 +22,12 @@ function Field({ label, id, icon: Icon, children, hint }) {
         {children}
       </div>
 
-      {hint ? (
+      {error ? (
+        <div className="flex items-center gap-1 text-red-500 text-xs" id={`${id}-error`}>
+          <AlertCircle className="h-3 w-3" />
+          {error}
+        </div>
+      ) : hint ? (
         <p className="text-xs text-[#677E8A]" id={`${id}-hint`}>
           {hint}
         </p>
@@ -35,26 +40,128 @@ const baseControl =
   "w-full rounded-xl border border-[#ABAFB5] bg-white px-4 py-3 pl-10 text-[#0E1D21] " +
   "placeholder:text-[#677E8A] shadow-sm outline-none transition " +
   "focus:border-[#2596be] focus:ring-4 focus:ring-[#2596be]/20 " +
-  "disabled:cursor-not-allowed disabled:opacity-60";
+  "disabled:cursor-not-allowed disabled:opacity-60 " +
+  "invalid:border-red-400 invalid:ring-red-400/20";
 
 export default function ContactPage() {
   const uid = useId();
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', subject: '', message: '',
   });
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [submitted, setSubmitted] = useState(false);
+
+  // Validation functions
+  const validateName = (name) => {
+    if (!name.trim()) return 'Name is required';
+    if (!/^[a-zA-Z\s]+$/.test(name)) return 'Name can only contain letters and spaces';
+    if (name.length < 2) return 'Name must be at least 2 characters';
+    return '';
+  };
+
+  const validatePhone = (phone) => {
+    if (!phone) return ''; // Optional field
+    // Remove all non-digits for validation
+    const digitsOnly = phone.replace(/\D/g, '');
+    if (!/^\d+$/.test(digitsOnly)) return 'Phone number can only contain digits';
+    if (digitsOnly.length < 7) return 'Phone number must be at least 7 digits';
+    return '';
+  };
+
+  const validateEmail = (email) => {
+    if (!email) return 'Email is required';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return 'Please enter a valid email address';
+    return '';
+  };
+
+  const validateForm = () => {
+    const newErrors = {
+      name: validateName(formData.name),
+      email: validateEmail(formData.email),
+      phone: validatePhone(formData.phone),
+      subject: !formData.subject ? 'Please select a subject' : '',
+      message: !formData.message.trim() ? 'Message is required' : '',
+    };
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error);
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    
+    switch (name) {
+      case 'name':
+        setErrors(prev => ({ ...prev, name: validateName(value) }));
+        break;
+      case 'phone':
+        setErrors(prev => ({ ...prev, phone: validatePhone(value) }));
+        break;
+      case 'email':
+        setErrors(prev => ({ ...prev, email: validateEmail(value) }));
+        break;
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((p) => ({ ...p, [name]: value }));
+    
+    let processedValue = value;
+    
+    // Apply specific validation/formatting for each field
+    switch (name) {
+      case 'name':
+        // Allow only letters and spaces
+        processedValue = value.replace(/[^a-zA-Z\s]/g, '');
+        break;
+      case 'phone':
+        // Allow only digits
+        processedValue = value.replace(/\D/g, '');
+        // Format with optional + prefix for international numbers
+        if (value.startsWith('+')) {
+          processedValue = '+' + value.slice(1).replace(/\D/g, '');
+        }
+        break;
+    }
+    
+    setFormData((p) => ({ ...p, [name]: processedValue }));
+    
+    // Clear error when user starts typing
+    if (errors[name] && touched[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Mark all fields as touched
+    setTouched({
+      name: true,
+      email: true,
+      phone: true,
+      subject: true,
+      message: true,
+    });
+    
+    if (!validateForm()) {
+      // Scroll to first error
+      const firstErrorField = document.querySelector('[aria-invalid="true"]');
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorField.focus();
+      }
+      return;
+    }
+    
     console.log('Form submitted:', formData);
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 3000);
     setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+    setErrors({});
+    setTouched({});
   };
 
   const ids = {
@@ -113,49 +220,73 @@ export default function ContactPage() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field label="Your name" id={ids.name} icon={User}>
+                  <Field 
+                    label="Your name" 
+                    id={ids.name} 
+                    icon={User}
+                    error={touched.name && errors.name}
+                  >
                     <input
                       id={ids.name}
                       name="name"
                       type="text"
                       value={formData.name}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                       required
-                      className={baseControl}
+                      className={`${baseControl} ${touched.name && errors.name ? 'border-red-400 ring-red-400/20' : ''}`}
                       placeholder="John Doe"
                       autoComplete="name"
+                      aria-invalid={!!(touched.name && errors.name)}
+                      aria-describedby={touched.name && errors.name ? `${ids.name}-error` : undefined}
                     />
                   </Field>
 
-                  <Field label="Email address" id={ids.email} icon={Mail}>
+                  <Field 
+                    label="Email address" 
+                    id={ids.email} 
+                    icon={Mail}
+                    error={touched.email && errors.email}
+                  >
                     <input
                       id={ids.email}
                       name="email"
                       type="email"
                       value={formData.email}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                       required
-                      className={baseControl}
+                      className={`${baseControl} ${touched.email && errors.email ? 'border-red-400 ring-red-400/20' : ''}`}
                       placeholder="john@example.com"
                       autoComplete="email"
+                      aria-invalid={!!(touched.email && errors.email)}
+                      aria-describedby={touched.email && errors.email ? `${ids.email}-error` : undefined}
                     />
                   </Field>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field label="Phone number" id={ids.phone} icon={Phone} hint="Optional">
+                  <Field 
+                    label="Phone number" 
+                    id={ids.phone} 
+                    icon={Phone} 
+                    hint="Optional - numbers only"
+                    error={touched.phone && errors.phone}
+                  >
                     <input
                       id={ids.phone}
                       name="phone"
                       type="tel"
                       value={formData.phone}
                       onChange={handleChange}
-                      className={baseControl}
-                      placeholder="+1 (555) 123-4567"
+                      onBlur={handleBlur}
+                      className={`${baseControl} ${touched.phone && errors.phone ? 'border-red-400 ring-red-400/20' : ''}`}
+                      placeholder="15551234567"
                       autoComplete="tel"
-                      aria-describedby={`${ids.phone}-hint`}
+                      aria-invalid={!!(touched.phone && errors.phone)}
+                      aria-describedby={touched.phone && errors.phone ? `${ids.phone}-error` : `${ids.phone}-hint`}
                     />
                   </Field>
 
@@ -174,8 +305,10 @@ export default function ContactPage() {
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
+                        onBlur={handleBlur}
                         required
-                        className={`${baseControl} appearance-none pr-10`}
+                        className={`${baseControl} appearance-none pr-10 ${touched.subject && errors.subject ? 'border-red-400 ring-red-400/20' : ''}`}
+                        aria-invalid={!!(touched.subject && errors.subject)}
                       >
                         <option value="" disabled>Select a subject</option>
                         <option value="general">General inquiry</option>
@@ -189,25 +322,41 @@ export default function ContactPage() {
                         <ChevronDown className="h-5 w-5" />
                       </div>
                     </div>
+                    
+                    {touched.subject && errors.subject && (
+                      <div className="flex items-center gap-1 text-red-500 text-xs">
+                        <AlertCircle className="h-3 w-3" />
+                        {errors.subject}
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <Field label="Message" id={ids.message} icon={MessageSquare}>
+                <Field 
+                  label="Message" 
+                  id={ids.message} 
+                  icon={MessageSquare}
+                  error={touched.message && errors.message}
+                >
                   <textarea
                     id={ids.message}
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     required
                     rows={4}
-                    className={baseControl}
+                    className={`${baseControl} ${touched.message && errors.message ? 'border-red-400 ring-red-400/20' : ''}`}
                     placeholder="Tell us how we can help you..."
+                    aria-invalid={!!(touched.message && errors.message)}
+                    aria-describedby={touched.message && errors.message ? `${ids.message}-error` : undefined}
                   />
                 </Field>
 
                 <button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#122E34] via-[#0E1D21] to-[#2596be] px-5 py-3 text-white font-semibold shadow-lg hover:from-[#122E34]/90 hover:via-[#0E1D21]/90 hover:to-[#2596be]/90 transition"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#122E34] via-[#0E1D21] to-[#2596be] px-5 py-3 text-white font-semibold shadow-lg hover:from-[#122E34]/90 hover:via-[#0E1D21]/90 hover:to-[#2596be]/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={submitted}
                 >
                   Send message
                   <ArrowRight className="h-4 w-4" />
@@ -233,9 +382,9 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="text-base font-semibold text-[#0E1D21]">Phone</h3>
-                    <p className="mt-0.5 text-lg font-semibold text-[#122E34]">+1 (555) 123-4567</p>
+                    <p className="mt-0.5 text-lg font-semibold text-[#122E34]">5551234567</p>
                     <p className="text-sm text-[#677E8A]">Mon–Fri 9am–6pm EST</p>
-                    <p className="mt-1 text-xs text-[#677E8A]">After-hours: +1 (555) 987-6543</p>
+                    <p className="mt-1 text-xs text-[#677E8A]">After-hours: 5559876543</p>
                   </div>
                 </div>
               </div>
