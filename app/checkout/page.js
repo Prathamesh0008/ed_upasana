@@ -20,6 +20,7 @@ import {
   Mail,
   Home,
   ShoppingBag,
+  AlertCircle,
 } from "lucide-react";
 
 export default function CheckoutPage() {
@@ -33,6 +34,7 @@ export default function CheckoutPage() {
   const [showAllInfo, setShowAllInfo] = useState(true);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -66,14 +68,38 @@ export default function CheckoutPage() {
     }
   }, [cartItems, router, orderPlaced]);
 
+  // Safe price formatting function
+  const formatPrice = (price) => {
+    if (price === null || price === undefined) {
+      return "0.00";
+    }
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    return isNaN(numPrice) ? "0.00" : numPrice.toFixed(2);
+  };
+
+  // Calculate cart total safely
+  const calculateSubtotal = () => {
+    if (!cartItems || cartItems.length === 0) return 0;
+    
+    return cartItems.reduce((total, item) => {
+      const price = item.price || 0;
+      const quantity = item.quantity || 1;
+      const itemPrice = typeof price === 'string' ? parseFloat(price) : price;
+      return total + (isNaN(itemPrice) ? 0 : itemPrice * quantity);
+    }, 0);
+  };
+
+  const subtotal = calculateSubtotal();
+  const tax = subtotal * 0.08;
+  const shipping = subtotal > 50 ? 0 : 9.99;
+  const total = subtotal + tax + shipping;
+
   // Validation functions
   const validateName = (name) => {
-    // Only allows letters, spaces, hyphens, and apostrophes
     return /^[A-Za-z\s'-]+$/.test(name);
   };
 
   const validatePhone = (phone) => {
-    // Remove non-digits for validation
     const digitsOnly = phone.replace(/\D/g, "");
     return digitsOnly.length === 10;
   };
@@ -88,7 +114,6 @@ export default function CheckoutPage() {
   };
 
   const validateExpiryDate = (expiryDate) => {
-    // Format: MM/YY
     return /^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryDate);
   };
 
@@ -189,10 +214,8 @@ export default function CheckoutPage() {
     
     // Format phone number as user types
     if (name === "phone") {
-      // Remove all non-digits
       const digitsOnly = value.replace(/\D/g, "");
       
-      // Format as (XXX) XXX-XXXX
       let formatted = digitsOnly;
       if (digitsOnly.length > 0) {
         formatted = "(" + digitsOnly.substring(0, 3);
@@ -206,119 +229,105 @@ export default function CheckoutPage() {
       
       setFormData((prev) => ({ ...prev, [name]: formatted }));
     }
-    // Restrict name fields to letters only
     else if (name === "firstName" || name === "lastName" || name === "city" || name === "state" || name === "cardName") {
-      // Allow letters, spaces, hyphens, and apostrophes
       if (value === "" || /^[A-Za-z\s'-]*$/.test(value)) {
         setFormData((prev) => ({ ...prev, [name]: value }));
       }
     }
-    // Format card number as user types
     else if (name === "cardNumber") {
-      // Remove all non-digits
       const digitsOnly = value.replace(/\D/g, "");
       
-      // Format as XXXX XXXX XXXX XXXX
       let formatted = digitsOnly;
       if (digitsOnly.length > 0) {
         formatted = digitsOnly.match(/.{1,4}/g)?.join(" ") || digitsOnly;
       }
       
-      // Limit to 16 digits
       if (digitsOnly.length <= 16) {
         setFormData((prev) => ({ ...prev, [name]: formatted }));
       }
     }
-    // Format expiry date as user types
     else if (name === "expiryDate") {
-      // Remove all non-digits
       const digitsOnly = value.replace(/\D/g, "");
       
-      // Format as MM/YY
       let formatted = digitsOnly;
       if (digitsOnly.length >= 2) {
         formatted = digitsOnly.substring(0, 2) + "/" + digitsOnly.substring(2, 4);
       }
       
-      // Limit to 4 digits (MM/YY)
       if (digitsOnly.length <= 4) {
         setFormData((prev) => ({ ...prev, [name]: formatted }));
       }
     }
-    // Format CVV as user types (numbers only)
     else if (name === "cvv") {
-      // Remove all non-digits
       const digitsOnly = value.replace(/\D/g, "");
       
-      // Limit to 4 digits
       if (digitsOnly.length <= 4) {
         setFormData((prev) => ({ ...prev, [name]: digitsOnly }));
       }
     }
-    // Format ZIP code as user types
     else if (name === "zipCode") {
-      // Remove all non-digits
       const digitsOnly = value.replace(/\D/g, "");
       
-      // Format as 5 digits or 5+4
       let formatted = digitsOnly;
       if (digitsOnly.length > 5) {
         formatted = digitsOnly.substring(0, 5) + "-" + digitsOnly.substring(5, 9);
       }
       
-      // Limit to 9 digits (for ZIP+4)
       if (digitsOnly.length <= 9) {
         setFormData((prev) => ({ ...prev, [name]: formatted }));
       }
     }
-    // For all other fields
     else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
     
-    // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
   };
 
-  const subtotal = cartTotal;
-  const tax = subtotal * 0.08;
-  const shipping = subtotal > 50 ? 0 : 9.99;
-  const total = subtotal + tax + shipping;
-
-  const placeOrder = () => {
+  const placeOrder = async () => {
+    setIsLoading(true);
+    
     // Validate all steps before placing order
     let isValid = true;
-    const allErrors = {};
     
-    // Validate step 1
     if (!validateStep(1)) {
       isValid = false;
       setStep(1);
+      setIsLoading(false);
       return;
     }
     
-    // Validate step 2
     if (!validateStep(2)) {
       isValid = false;
       setStep(2);
+      setIsLoading(false);
       return;
     }
     
-    // Validate step 3
     if (!validateStep(3)) {
       isValid = false;
       setStep(3);
+      setIsLoading(false);
       return;
     }
     
     if (isValid) {
-      const orderId = `ORD-${Date.now().toString().slice(-8)}`;
-      setOrderNumber(orderId);
-      clearCart();
-      setOrderPlaced(true);
-      setFormSubmitted(true);
+      try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        const orderId = `ORD-${Date.now().toString().slice(-8)}`;
+        setOrderNumber(orderId);
+        clearCart();
+        setOrderPlaced(true);
+        setFormSubmitted(true);
+      } catch (error) {
+        console.error("Order placement error:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -343,7 +352,8 @@ export default function CheckoutPage() {
   const maskCardNumber = (cardNumber) => {
     if (!cardNumber) return "•••• •••• •••• ••••";
     const digitsOnly = cardNumber.replace(/\D/g, "");
-    return "•••• •••• •••• " + digitsOnly.slice(-4);
+    const lastFour = digitsOnly.slice(-4);
+    return lastFour ? "•••• •••• •••• " + lastFour : "•••• •••• •••• ••••";
   };
 
   const maskCVV = (cvv) => {
@@ -359,12 +369,14 @@ export default function CheckoutPage() {
 
   if (orderPlaced) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50 p-10 rounded-2xl shadow-2xl text-center max-w-md border border-[#2596be]/20">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md border border-[#2596be]/20">
           <div className="relative">
             <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-r from-[#2596be] to-[#122E34] rounded-full blur-xl opacity-20"></div>
             <div className="absolute -bottom-10 -left-10 w-20 h-20 bg-gradient-to-r from-[#622347] to-[#122E34] rounded-full blur-xl opacity-20"></div>
-            <CheckCircle size={80} className="mx-auto text-[#2596be] mb-6 animate-pulse" />
+            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center animate-pulse">
+              <CheckCircle size={48} className="text-white" />
+            </div>
           </div>
           <h1 className="text-3xl font-bold mb-3 bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
             Order Confirmed!
@@ -402,7 +414,7 @@ export default function CheckoutPage() {
               <div className="flex justify-between items-center pt-3 border-t border-gray-200">
                 <span className="text-gray-600 text-lg">Total Amount:</span>
                 <span className="font-bold text-xl bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
-                  ${total.toFixed(2)}
+                  ${formatPrice(total)}
                 </span>
               </div>
             </div>
@@ -459,7 +471,7 @@ export default function CheckoutPage() {
               <div className="hidden md:block">
                 <p className="text-gray-600 text-sm">Total Amount</p>
                 <p className="text-2xl font-bold bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
-                  ${total.toFixed(2)}
+                  ${formatPrice(total)}
                 </p>
               </div>
             </div>
@@ -1102,33 +1114,45 @@ export default function CheckoutPage() {
                       Order Total
                     </h3>
                     <p className="text-2xl font-bold bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
-                      ${total.toFixed(2)}
+                      ${formatPrice(total)}
                     </p>
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Subtotal</span>
-                      <span className="text-gray-900">${subtotal.toFixed(2)}</span>
+                      <span className="text-gray-900">${formatPrice(subtotal)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Shipping</span>
                       <span className={shipping === 0 ? "text-[#2596be] font-semibold" : "text-gray-900"}>
-                        {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                        {shipping === 0 ? "FREE" : `$${formatPrice(shipping)}`}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Tax (8%)</span>
-                      <span className="text-gray-900">${tax.toFixed(2)}</span>
+                      <span className="text-gray-900">${formatPrice(tax)}</span>
                     </div>
                   </div>
                 </div>
 
                 <button
                   onClick={placeOrder}
-                  className="w-full bg-gradient-to-r from-[#2596be] via-[#622347] to-[#122E34] text-white py-4 rounded-xl font-bold hover:opacity-90 transition-all duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center gap-3 transform hover:-translate-y-1 text-lg group"
+                  disabled={isLoading}
+                  className={`w-full bg-gradient-to-r from-[#2596be] via-[#622347] to-[#122E34] text-white py-4 rounded-xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center gap-3 transform hover:-translate-y-1 text-lg group ${
+                    isLoading ? "opacity-80 cursor-not-allowed" : "hover:opacity-90"
+                  }`}
                 >
-                  <Lock size={22} className="group-hover:scale-110 transition-transform" />
-                  <span>Place Secure Order • ${total.toFixed(2)}</span>
+                  {isLoading ? (
+                    <>
+                      <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Processing Order...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock size={22} className="group-hover:scale-110 transition-transform" />
+                      <span>Place Secure Order • ${formatPrice(total)}</span>
+                    </>
+                  )}
                 </button>
 
                 <div className="flex items-center justify-center gap-2 mt-6 text-sm text-gray-600">
@@ -1164,30 +1188,38 @@ export default function CheckoutPage() {
                     </button>
                   </div>
                 ) : (
-                  cartItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-all group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#2596be]/20 to-[#122E34]/20 rounded-lg flex items-center justify-center group-hover:from-[#2596be]/30 group-hover:to-[#122E34]/30 transition-all">
-                          <span className="font-bold text-[#2596be]">{item.quantity}</span>
+                  cartItems.map((item) => {
+                    const safePrice = item.price || 0;
+                    const price = typeof safePrice === 'string' ? parseFloat(safePrice) : safePrice;
+                    const itemPrice = isNaN(price) ? 0 : price;
+                    const quantity = item.quantity || 1;
+                    const itemTotal = itemPrice * quantity;
+                    
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-all group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-[#2596be]/20 to-[#122E34]/20 rounded-lg flex items-center justify-center group-hover:from-[#2596be]/30 group-hover:to-[#122E34]/30 transition-all">
+                            <span className="font-bold text-[#2596be]">{quantity}</span>
+                          </div>
+                          <div className="max-w-[140px]">
+                            <p className="font-semibold text-gray-900 text-sm truncate">{item.name}</p>
+                            <p className="text-xs text-gray-600">${formatPrice(itemPrice)} each</p>
+                          </div>
                         </div>
-                        <div className="max-w-[140px]">
-                          <p className="font-semibold text-gray-900 text-sm truncate">{item.name}</p>
-                          <p className="text-xs text-gray-600">${item.price.toFixed(2)} each</p>
+                        <div className="text-right">
+                          <p className="font-bold text-gray-900">${formatPrice(itemTotal)}</p>
+                          {quantity > 1 && (
+                            <p className="text-xs text-gray-500">
+                              {quantity} × ${formatPrice(itemPrice)}
+                            </p>
+                          )}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-gray-900">${(item.price * item.quantity).toFixed(2)}</p>
-                        {item.quantity > 1 && (
-                          <p className="text-xs text-gray-500">
-                            {item.quantity} × ${item.price.toFixed(2)}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 
@@ -1195,23 +1227,23 @@ export default function CheckoutPage() {
               <div className="space-y-3">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>${formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
                   <span className={shipping === 0 ? "text-[#2596be] font-semibold" : ""}>
-                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? "FREE" : `$${formatPrice(shipping)}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Tax (8%)</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>${formatPrice(tax)}</span>
                 </div>
                 <hr className="my-3 border-gray-300" />
                 <div className="flex justify-between items-center text-lg font-bold pt-2">
                   <span className="text-gray-900">Total Amount</span>
                   <span className="text-2xl bg-gradient-to-r from-[#2596be] to-[#677E8A] bg-clip-text text-transparent">
-                    ${total.toFixed(2)}
+                    ${formatPrice(total)}
                   </span>
                 </div>
               </div>
@@ -1298,13 +1330,13 @@ export default function CheckoutPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600 text-sm">Shipping Cost</span>
                   <span className={`text-sm font-semibold ${shipping === 0 ? "text-[#2596be]" : "text-gray-900"}`}>
-                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? "FREE" : `$${formatPrice(shipping)}`}
                   </span>
                 </div>
                 {subtotal < 50 && (
                   <div className="p-3 bg-gradient-to-r from-blue-50 to-gray-50 rounded-lg border border-[#2596be]/30">
                     <p className="text-xs text-center text-[#2596be]">
-                      Add ${(50 - subtotal).toFixed(2)} more for free shipping!
+                      Add ${formatPrice(50 - subtotal)} more for free shipping!
                     </p>
                   </div>
                 )}
