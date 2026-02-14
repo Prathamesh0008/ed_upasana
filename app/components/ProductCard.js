@@ -5,7 +5,7 @@ import { getPriceByQty } from '@/app/utils/getPriceByQty';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../context/CartContext';  
 
 function ProductCard({ product }) {
   const { addToCart } = useCart();   // ✅ THIS WAS MISSING

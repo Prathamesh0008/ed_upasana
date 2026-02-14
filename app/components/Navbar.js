@@ -295,22 +295,14 @@ export default function Navbar() {
                   </>
                 ) : (
                   <>
-                    <Link
-                      href="/login"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="block px-4 py-3.5 text-sm font-medium text-[#2596be] rounded-xl hover:bg-gradient-to-r hover:from-[#2596be]/5 hover:to-[#122E34]/5 transition-all duration-300 mb-2 group relative"
-                    >
-                      <div className="absolute -inset-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#2596be]/10 to-[#122E34]/10"></div>
-                      <span className="relative z-10">Sign In</span>
-                    </Link>
-                    <Link
-                      href="/register"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="block px-4 py-3.5 text-sm font-medium bg-gradient-to-r from-[#2596be] to-[#122E34] text-white rounded-xl hover:shadow-lg transition-all duration-300 relative overflow-hidden group"
-                    >
-                      <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
-                      <span className="relative z-10">Sign Up</span>
-                    </Link>
+              <Link
+    href="/register"
+    onClick={() => setIsMenuOpen(false)}
+    className="block px-4 py-3.5 text-sm font-medium bg-gradient-to-r from-[#2596be] to-[#122E34] text-white rounded-xl hover:shadow-lg transition-all duration-300 relative overflow-hidden group"
+  >
+    <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+    <span className="relative z-10">Sign Up</span>
+  </Link>
                   </>
                 )}
               </div>
